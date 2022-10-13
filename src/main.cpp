@@ -9,24 +9,27 @@
 #include "graphic/block_vertex.h"
 #include <iostream>
 #include "resource.h"
+#include "world/world.h"
 
 int main()
 {
-    yc::Application app(1200, 900, "Yourcraft");
-    yc::world::Chunk chunk ({ 0, 0, 0 });
+    yc::Application app(1600, 800, "Yourcraft");
+    auto overworld = std::make_shared<yc::world::World>();
+    bool lineMode = false;
 
-    chunk.loadBlock();
-    chunk.buildMesh();
-
+    overworld->loadChunks();
     double previousTime = glfwGetTime();
     int frameCount = 0;
+
+    app.getCamera()->setPosition({ 0, 52, 0 });
+    app.getCamera()->setOrientation(-89, 0);
 
     while (!app.isStopped()) {
         double currentTime = glfwGetTime();
         frameCount++;
         // If a second has passed.
         if ( currentTime - previousTime >= 1.0 ) {
-            std::cout << frameCount << '\n';
+            std::cout << "FPS: " << frameCount << '\n';
             frameCount = 0;
             previousTime = currentTime;
         }
@@ -63,7 +66,7 @@ int main()
         yc::Resource::GameTexure.bind();
         yc::Resource::ChunkShader.use();
         yc::Resource::ChunkShader.setMat4("projection_view", app.getCamera()->getProjectionViewMatrix());
-        chunk.render();
+        overworld->render();
 
         glfwSwapBuffers(app.window);
         glfwPollEvents();    

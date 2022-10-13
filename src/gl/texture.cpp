@@ -31,14 +31,14 @@ void yc::gl::Texture::loadFromFile(std::string path) {
 
     std::cout << "Loaded texture " << path << " (" << this->width << "x" << this->height << ")\n";
 
-    unsigned bytePerPixel = nrChannels;
-    unsigned char* pixelOffset = data + (0+ width * 255) * bytePerPixel;
-    unsigned char r = pixelOffset[0];
-    unsigned char g = pixelOffset[1];
-    unsigned char b = pixelOffset[2];
-    unsigned char a = nrChannels >= 4 ? pixelOffset[3] : 0xff;
+    // unsigned bytePerPixel = nrChannels;
+    // unsigned char* pixelOffset = data + (0+ width * 255) * bytePerPixel;
+    // unsigned char r = pixelOffset[0];
+    // unsigned char g = pixelOffset[1];
+    // unsigned char b = pixelOffset[2];
+    // unsigned char a = nrChannels >= 4 ? pixelOffset[3] : 0xff;
 
-    std::cout << ((int)r) << ' ' << ((int)g) << ' ' << ((int)b) << '\n';
+    // std::cout << ((int)r) << ' ' << ((int)g) << ' ' << ((int)b) << '\n';
 
     stbi_image_free(data);
 }

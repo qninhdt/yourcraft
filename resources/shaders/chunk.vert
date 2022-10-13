@@ -21,5 +21,5 @@ void main()
     tex_coord = uvec2(tex_x, 15 - tex_y);
     vert_pos = vec2(uv_x, uv_y);
 
-    gl_Position = projection_view * vec4(x, y, z, 1.0f);
+    gl_Position = projection_view * model * vec4(x, y, z, 1.0f);
 }

@@ -15,6 +15,7 @@ add_executable(YourCraft
     src/gl/shader.cpp
     src/world/chunk.cpp
     src/world/block.cpp
+    src/world/world.cpp
     deps/glad/src/glad.c
 )
 

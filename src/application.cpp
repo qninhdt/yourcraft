@@ -52,9 +52,8 @@ Application::Application(uint32_t width, uint32_t height, const std::string& tit
 
     // disable cursor
     glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
     Resource::Load();
-    // glDepthFunc(GL_ALWAYS);
     this->camera.init(this->width, this->height);
     this->display.init();
 }
@@ -95,7 +94,17 @@ Camera* Application::getCamera() {
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     Application* app = (Application*) glfwGetWindowUserPointer(window);
     
-    
+    static bool lineMode = false;
+
+    if (glfwGetKey(app->window, GLFW_KEY_F3) == GLFW_PRESS) {
+        lineMode = !lineMode;
+
+        if (lineMode) {
+            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+        } else {
+            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+        }
+    }
 }
 
 void mouseCallback(GLFWwindow* window, double xpos, double ypos) {
