@@ -142,4 +142,10 @@ Application::~Application() {
     glfwTerminate();
 }
 
+float Application::deltaTime;
+
+float Application::GetDeltaTime() {
+    return Application::deltaTime;
+}
+
 }

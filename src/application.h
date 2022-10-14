@@ -12,6 +12,8 @@ namespace yc {
 class Application {
 
 public:
+    static float GetDeltaTime();
+
     Application(uint32_t width, uint32_t height, const std::string& title);
     ~Application();
 
@@ -26,6 +28,8 @@ public:
     GLFWwindow* window;
 
 private:
+
+    static float deltaTime;
 
     bool stopped;
     uint32_t width;

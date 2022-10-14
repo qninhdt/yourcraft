@@ -12,16 +12,16 @@ class Camera {
 public:
     Camera();
     void init(uint32_t screenWidth, uint32_t screenHeight);
-    glm::mat4 getViewMatrix();
-    glm::mat4 getProjectionMatrix();
-    glm::mat4 getProjectionViewMatrix();
-    float getYaw();
-    float getPitch();
+    glm::mat4 getViewMatrix() const;
+    glm::mat4 getProjectionMatrix() const;
+    glm::mat4 getProjectionViewMatrix() const;
+    float getYaw() const;
+    float getPitch() const;
     void setOrientation(float pitch, float yaw);
-    float getZoom();
-    glm::vec3 getRight();
-    glm::vec3 getFront();
-    glm::vec3 getPosition();
+    float getZoom() const;
+    glm::vec3 getRight() const;
+    glm::vec3 getFront() const;
+    glm::vec3 getPosition() const;
     void setPosition(glm::vec3 position);
     
 private:

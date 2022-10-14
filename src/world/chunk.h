@@ -28,6 +28,8 @@ public:
 
     void render();
 
+    static int32_t DistanceTo(const glm::ivec2& chunkCoord, const glm::ivec2& coord);
+
     BlockData getBlockDataAt(const glm::ivec3& coord);
 
     glm::ivec3 getWorldCoordOfBlock(const glm::ivec3& blockCoord);
@@ -39,6 +41,8 @@ private:
 
     glm::ivec2 coord;
     std::shared_ptr<World> world;
+
+    bool built;
 };
 
 }
