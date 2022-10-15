@@ -8,8 +8,7 @@ BlockData::BlockData() {
     this->data = 0;
 }
 
-BlockData::BlockData(BlockType blockType) {
-    BlockData(blockType, BlockFaceDirection::NONE);
+BlockData::BlockData(BlockType blockType): BlockData(blockType, BlockFaceDirection::NONE) {
 }
 
 BlockData::BlockData(BlockType blockType, BlockFaceDirection faceDirection) {

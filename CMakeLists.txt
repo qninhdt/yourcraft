@@ -16,12 +16,13 @@ add_executable(YourCraft
     src/world/chunk.cpp
     src/world/block.cpp
     src/world/world.cpp
+    src/world/world_generator.cpp
     deps/glad/src/glad.c
 )
 
 target_link_libraries(YourCraft ${CMAKE_SOURCE_DIR}/build/glfw3.dll)
 include_directories(src)
 include_directories(deps/glad/include)
-include_directories(deps/GLFW/include)
-include_directories(deps/stb)
-include_directories(deps/glm/include)
+include_directories(deps/GLFW)
+include_directories(deps/glm)
+include_directories(deps)

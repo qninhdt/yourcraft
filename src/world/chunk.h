@@ -20,11 +20,11 @@ public:
 
     void setCoordinate(const std::shared_ptr<World>& world, const glm::ivec2& coord);
 
-    void loadBlock();
-
     void buildMesh();
 
-    void rebuildMesh();
+    void buildMeshIfNeeded();
+
+    void prepareToBuildMesh();
 
     void render();
 
@@ -34,6 +34,10 @@ public:
 
     glm::ivec3 getWorldCoordOfBlock(const glm::ivec3& blockCoord);
 
+    glm::ivec3 getWorldCoord() const;
+
+    void setBlockData(const glm::ivec3& coord, BlockData blockData);
+
 private:
 
     BlockData blocks[Length][Height][Width]; // 0.5Mb wtf?
@@ -42,7 +46,8 @@ private:
     glm::ivec2 coord;
     std::shared_ptr<World> world;
 
-    bool built;
+    bool needToBuildMesh;
+    bool firstMeshBuild;
 };
 
 }

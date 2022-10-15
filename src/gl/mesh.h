@@ -16,6 +16,7 @@ public:
     void unbind();
     void draw();
     void addIndices(const std::vector<uint32_t>& indices);
+    void updateIndices(const std::vector<uint32_t>& indices);
     void updateStaticBuffer(size_t index, const std::vector<float>& data);
     void updateStaticBuffer(size_t index, const float* data, size_t dataSize);
     void addStaticBuffer(size_t size, const float* data, size_t dataSize);
@@ -30,6 +31,7 @@ private:
     GLuint ebo;
     size_t indicesCount;
     std::vector<GLuint> buffers;
+    std::vector<size_t> bufferSizes;
 
     template<typename T>
     void addBuffer(size_t size, T* data, size_t dataSize, GLuint dataType, GLuint drawType);

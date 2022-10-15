@@ -19,28 +19,27 @@ const std::array<glm::ivec3, 6> directionsToCheck = {{
 Chunk::Chunk() {
     // set all blocks in chunk to air (default block type)
     std::fill(&this->blocks[0][0][0], &this->blocks[0][0][0] + Chunk::Volume, BlockData::Default);
-    built = false;
+    this->needToBuildMesh = true;
+    this->firstMeshBuild = true;
 }
 
-void Chunk::loadBlock() {
-    // std::random_device rd;
-    // std::mt19937 gen(rd());
-    // std::uniform_int_distribution<> distr(3, 20);
-
-    for (int x=0; x<Chunk::Length; ++x) {
-        for (int z=0; z<Chunk::Width; ++z) {
-            int height = abs(sqrt(abs(x-8)+abs(z-8))*30);
-            // int height = 1;
-            for (int y=0;y<height;++y) {
-                this->blocks[x][y][z].setType(BlockType::DIRT);
-            }
-        }
-    }
+void Chunk::prepareToBuildMesh() {
+    this->needToBuildMesh = true;
 }
 
 void Chunk::setCoordinate(const std::shared_ptr<World>& world, const glm::ivec2& coord) {
     this->world = world;
     this->coord = coord;
+}
+
+glm::ivec3 Chunk::getWorldCoord() const {
+    return { this->coord.x * Chunk::Length, 0, this->coord.y * Chunk::Width };
+}
+
+void Chunk::buildMeshIfNeeded() {
+    if (this->needToBuildMesh) {
+        buildMesh();
+    }
 }
 
 void Chunk::buildMesh() {
@@ -51,7 +50,7 @@ void Chunk::buildMesh() {
         for (int y=0; y<Chunk::Height; ++y) {
             for (int z=0; z<Chunk::Width; ++z) {
                 auto& block = this->blocks[x][y][z];
-                if (this->blocks[x][y][z].getType() == BlockType::AIR) {
+                if (block.getType() == BlockType::AIR) {
                     continue;
                 }
                 
@@ -94,15 +93,22 @@ void Chunk::buildMesh() {
         }
     }
 
-    this->mesh.init();
-    this->mesh.bind();
+    if (this->firstMeshBuild) {
+        this->mesh.init();
+        this->mesh.bind();
+        this->mesh.addIndices(chunkIndices);
+        this->mesh.addStaticBuffer(1, chunkVertices);
+        this->mesh.unbind();
+        
+        this->firstMeshBuild = false;
+    }  else {
+        this->mesh.bind();
+        this->mesh.updateIndices(chunkIndices);
+        this->mesh.updateStaticBuffer(0, chunkVertices);
+        this->mesh.unbind();
+    }
 
-    this->mesh.addIndices(chunkIndices);
-    this->mesh.addStaticBuffer(1, chunkVertices);
-
-    this->mesh.unbind();
-
-    this->built = true;
+    this->needToBuildMesh = false;
 }
 
 glm::ivec3 Chunk::getWorldCoordOfBlock(const glm::ivec3& blockCoord) {
@@ -110,7 +116,11 @@ glm::ivec3 Chunk::getWorldCoordOfBlock(const glm::ivec3& blockCoord) {
     assert(blockCoord.y>=0 && blockCoord.y<Chunk::Height);
     assert(blockCoord.z>=0 && blockCoord.z<Chunk::Width);
 
-    return { this->coord.x * Chunk::Length + blockCoord.x, blockCoord.y, this->coord.y * Chunk::Width + blockCoord.z };
+    return {
+        blockCoord.x + this->coord.x*Chunk::Length,
+        blockCoord.y,
+        blockCoord.z + this->coord.y*Chunk::Width
+    };
 }
 
 BlockData Chunk::getBlockDataAt(const glm::ivec3& coord) {
@@ -122,10 +132,15 @@ BlockData Chunk::getBlockDataAt(const glm::ivec3& coord) {
 }
 
 void Chunk::render() {
-    if (!this->built) return;
+    if (this->firstMeshBuild) return;
     this->mesh.bind();
     this->mesh.draw();
     this->mesh.unbind();
+}
+
+void Chunk::setBlockData(const glm::ivec3& coord, BlockData blockData) {
+    this->blocks[coord.x][coord.y][coord.z] = blockData;
+    prepareToBuildMesh();
 }
 
 int32_t Chunk::DistanceTo(const glm::ivec2& chunkCoord, const glm::ivec2& coord) {

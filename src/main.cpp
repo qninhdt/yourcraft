@@ -10,17 +10,18 @@
 #include <iostream>
 #include "resource.h"
 #include "world/world.h"
+#include "world/world_generator.h"
+#include "util/math.h"
 
 int main()
 {
-    yc::Application app(1600, 800, "Yourcraft");
+    yc::Application app(1000, 600, "Yourcraft");
     auto overworld = std::make_shared<yc::world::World>();
     bool lineMode = false;
 
     double previousTime = glfwGetTime();
     int frameCount = 0;
     float deltaTime = 0;
-
     app.getCamera()->setPosition({ 0, 52, 0 });
     app.getCamera()->setOrientation(-89, 0);
 
@@ -36,11 +37,17 @@ int main()
             previousTime = currentTime;
         }
 
-        const float cameraSpeed = 50.0f; // adjust accordingly
+        float cameraSpeed = 50.0f; // adjust accordingly
         glm::vec3 new_position = app.getCamera()->getPosition();
+
+        if (glfwGetKey(app.window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) cameraSpeed *= 2;
 
         if (glfwGetKey(app.window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
             app.stop();
+        }
+
+        if (glfwGetKey(app.window, GLFW_KEY_F5) == GLFW_PRESS) {
+            overworld->reloadChunks();
         }
 
         if (glfwGetKey(app.window, GLFW_KEY_ESCAPE) == GLFW_PRESS)

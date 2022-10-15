@@ -1,6 +1,8 @@
 #pragma once
 
 #include <unordered_map>
+#include <map>
+#include "world/world_generator.h"
 #include "world/chunk.h"
 #include "camera.h"
 
@@ -16,7 +18,7 @@ public:
 
     World();
 
-    void loadChunks();
+    void init();
 
     void update(const yc::Camera& camera);
 
@@ -30,11 +32,17 @@ public:
 
     void unloadChunk(const glm::ivec2& chunkCoord);
 
+    void reloadChunks();
+
+    int32_t getSeed() const;
+
+    std::shared_ptr<FastNoiseLite> getNoiseHandle() const;
+
 private:
 
     std::unordered_map<glm::ivec2, std::shared_ptr<Chunk>, HashChunkCoord> chunks;
 
-    std::vector<std::shared_ptr<Chunk>> unbuiltChunks;
+    WorldGenerator generator;
 };
 
 }
