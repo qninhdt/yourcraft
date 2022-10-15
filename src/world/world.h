@@ -26,6 +26,8 @@ public:
 
     BlockData getBlockDataIfLoadedAt(const glm::ivec3& coord);
 
+    std::shared_ptr<Chunk> getChunkIfLoadedAt(const glm::ivec2& coord);
+
     bool isChunkLoaded(const glm::ivec2& chunkCoord);
 
     void generateOrLoadChunkAt(const glm::ivec2& chunkCoord);

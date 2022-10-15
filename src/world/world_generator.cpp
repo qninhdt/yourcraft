@@ -1,5 +1,5 @@
 #include "world/world_generator.h"
-
+#include <iostream>
 namespace yc::world {
 
 WorldGenerator::WorldGenerator(int32_t seed): seed(seed), noiseHandle(seed) {
@@ -11,7 +11,7 @@ WorldGenerator::WorldGenerator(int32_t seed): seed(seed), noiseHandle(seed) {
 
 std::shared_ptr<Chunk> WorldGenerator::generateChunk(std::shared_ptr<World> world,
     const glm::ivec2& chunkCoord) {
-    
+        
     auto chunk = std::make_shared<Chunk>();
     chunk->setCoordinate(world, chunkCoord);
 
@@ -24,8 +24,8 @@ std::shared_ptr<Chunk> WorldGenerator::generateChunk(std::shared_ptr<World> worl
             float noiseValue = this->noiseHandle.GetNoise(noiseX, noiseZ);
 
             int32_t height = 45 + static_cast<int32_t>(noiseValue * 45);
-
-            for (int32_t y=0; y<height; ++y) {
+            
+            for (int32_t y=0; y<height-1; ++y) {
                 glm::ivec3 blockCoord = { x, y, z };
                 BlockData blockData;
 
@@ -33,6 +33,7 @@ std::shared_ptr<Chunk> WorldGenerator::generateChunk(std::shared_ptr<World> worl
 
                 chunk->setBlockData(blockCoord, blockData);
             }
+            chunk->setBlockData({ x, height-1, z }, { BlockType::GRASS });
         }
     }
 

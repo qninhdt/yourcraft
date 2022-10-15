@@ -11,7 +11,7 @@ void Camera::init(uint32_t screenWidth, uint32_t screenHeight) {
     m_position = glm::vec3(0);
 
     float screenRatio = 1.0f * screenWidth / screenHeight;
-    m_projectionMatrix = glm::perspective(glm::radians(45.0f), screenRatio, 0.1f, 500.0f);
+    m_projectionMatrix = glm::perspective(glm::radians(45.0f), screenRatio, 0.1f, 1000.0f);
 
     updateDirection();
     updateMatrix();

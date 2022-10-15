@@ -26,20 +26,33 @@ void World::update(const yc::Camera& camera) {
         }
     }
 
-    int cnt = 0;
-    const int32_t maxChunkLoadPerFrame = 3;
-    for (int32_t x=-viewDistance; x<=viewDistance && cnt<maxChunkLoadPerFrame; ++x) {
-        for (int32_t z=-viewDistance; z<=viewDistance && cnt<maxChunkLoadPerFrame; ++z) {
+    int32_t chunkCount = 0;
+    const int32_t maxChunksLoadPerFrame = 4;
+
+    int32_t x=0, z=0, dx=0, dz=-1;
+    int32_t size = viewDistance*2+1;
+    int32_t numChunksToCheck = size*size;
+
+    while (numChunksToCheck-- && chunkCount < maxChunksLoadPerFrame) {
+        if (-size/2 < x &&  x <= size/2 && -size/2 < z && z <= size/2) {
             glm::ivec2 chunkCoordToCheck = glm::ivec2(x, z) + cameraChunkCoord;
 
             if (Chunk::DistanceTo(chunkCoordToCheck, cameraChunkCoord) <= viewDistance) {
                 if (!isChunkLoaded(chunkCoordToCheck)) {
                     generateOrLoadChunkAt(chunkCoordToCheck);
-                    ++cnt;
+                    ++chunkCount;
                 }
             }
         }
+        if (x == z || (x < 0 && x == -z) || (x > 0 && x == 1-z)) {
+            int32_t t = dx;
+            dx = -dz;
+            dz = t;
+        }
+        x += dx;
+        z += dz;
     }
+
     for (auto& [chunkCoord, chunk]: this->chunks) {
         chunk->buildMeshIfNeeded();
     }
@@ -113,8 +126,22 @@ BlockData World::getBlockDataIfLoadedAt(const glm::ivec3& coord) {
 }
 
 void World::reloadChunks() {
+    double begin = glfwGetTime();
     for (auto& [chunkCoord, chunk]: this->chunks) {
         chunk->buildMesh();
+    }
+    double end = glfwGetTime();
+
+    std::cout << "Reload: " << end - begin << " s\n";
+}
+
+std::shared_ptr<Chunk> World::getChunkIfLoadedAt(const glm::ivec2& coord) {
+    auto iter = this->chunks.find(coord);
+
+    if (iter != this->chunks.end()) {
+        return iter->second;
+    } else {
+        return nullptr;
     }
 }
 

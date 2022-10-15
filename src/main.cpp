@@ -15,27 +15,29 @@
 
 int main()
 {
-    yc::Application app(1000, 600, "Yourcraft");
+    yc::Application app(1600, 800, "Yourcraft");
     auto overworld = std::make_shared<yc::world::World>();
     bool lineMode = false;
 
-    double previousTime = glfwGetTime();
+    float previousTime = glfwGetTime();
     int frameCount = 0;
-    float deltaTime = 0;
+    float deltaTime = 1.0f/60;
     app.getCamera()->setPosition({ 0, 52, 0 });
     app.getCamera()->setOrientation(-89, 0);
 
     while (!app.isStopped()) {
-        double currentTime = glfwGetTime();
+        float currentTime = glfwGetTime();
         frameCount++;
-        // If a second has passed.
-        if ( currentTime - previousTime >= 1.0 ) {
-            std::cout << "FPS: " << frameCount << '\n';
-            deltaTime = 1.0f/frameCount;
+        deltaTime = (currentTime-previousTime)/frameCount;
+
+        if (currentTime - previousTime >= 0.01) {
+            std::string s = "Yourcraft - FPS: " + std::to_string(static_cast<int>(1/deltaTime));
+            glfwSetWindowTitle(app.window, s.c_str());
 
             frameCount = 0;
             previousTime = currentTime;
         }
+        
 
         float cameraSpeed = 50.0f; // adjust accordingly
         glm::vec3 new_position = app.getCamera()->getPosition();
