@@ -7,23 +7,23 @@
 namespace yc::world {
 
 enum class BlockType {
-    NONE = 0,
-    AIR,
+    AIR = 0,
     DIRT,
     GRASS,
     SAND,
     STONE,
     WOOD,
+    NONE,
 };
 
 enum class BlockFaceDirection {
-    NONE = 0,
+    UP = 0,
+    DOWN,
     SOUTH,
     NORTH,
     EAST,
     WEST,
-    UP,
-    DOWN,
+    NONE,
 };
 
 class BlockData {

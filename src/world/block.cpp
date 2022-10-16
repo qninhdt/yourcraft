@@ -5,6 +5,7 @@ namespace yc::world {
 const BlockData BlockData::Default = { BlockType::AIR, BlockFaceDirection::NONE };
 
 BlockData::BlockData() {
+    // default block type == AIR, faceDirection == UP
     this->data = 0;
 }
 

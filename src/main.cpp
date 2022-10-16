@@ -1,3 +1,5 @@
+// #pragma GCC optimize ("O3")
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "gl/shader.h"

@@ -18,27 +18,37 @@ void Mesh::unbind() {
 
 void Mesh::draw() {
     glDrawElements(GL_TRIANGLES, this->indicesCount, GL_UNSIGNED_INT, 0);
+
+
 }
 
 void Mesh::addIndices(const std::vector<uint32_t>& indices) {
-    this->indicesCount = indices.size();
+    addIndices(indices.data(), indices.size());
+}
+
+void Mesh::addIndices(const uint32_t* indices, size_t indicesSize) {
+    this->indicesCount = indicesSize;
 
     glGenBuffers(1, &this->ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->indicesCount * sizeof(uint32_t),
-        indices.data(), GL_STATIC_DRAW);
+        indices, GL_STATIC_DRAW);
+}
+
+void Mesh::updateIndices(const uint32_t* indices, size_t indicesSize) {
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);
+    if (indicesSize > this->indicesCount) {
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize * sizeof(uint32_t),
+            indices, GL_STATIC_DRAW);
+    } else {
+        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, indicesSize * sizeof(uint32_t),
+            indices);        
+    }
+    this->indicesCount = indicesSize;
 }
 
 void Mesh::updateIndices(const std::vector<uint32_t>& indices) {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);
-    if (indices.size() > this->indicesCount) {
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint32_t),
-            indices.data(), GL_STATIC_DRAW);
-    } else {
-        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, indices.size() * sizeof(uint32_t),
-            indices.data());
-    }
-    this->indicesCount = indices.size();
+    updateIndices(indices.data(), indices.size());
 }
 
 template<typename T>

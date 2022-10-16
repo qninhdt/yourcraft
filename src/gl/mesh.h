@@ -16,7 +16,9 @@ public:
     void unbind();
     void draw();
     void addIndices(const std::vector<uint32_t>& indices);
+    void addIndices(const uint32_t* indices, size_t indicesSize);
     void updateIndices(const std::vector<uint32_t>& indices);
+    void updateIndices(const uint32_t* indices, size_t indicesSize);
     void updateStaticBuffer(size_t index, const std::vector<float>& data);
     void updateStaticBuffer(size_t index, const float* data, size_t dataSize);
     void addStaticBuffer(size_t size, const float* data, size_t dataSize);

@@ -27,30 +27,33 @@ void World::update(const yc::Camera& camera) {
     }
 
     int32_t chunkCount = 0;
-    const int32_t maxChunksLoadPerFrame = 4;
+    const int32_t maxChunksLoadPerFrame = 400;
 
     int32_t x=0, z=0, dx=0, dz=-1;
     int32_t size = viewDistance*2+1;
     int32_t numChunksToCheck = size*size;
-
+    double begin = glfwGetTime();
     while (numChunksToCheck-- && chunkCount < maxChunksLoadPerFrame) {
-        if (-size/2 < x &&  x <= size/2 && -size/2 < z && z <= size/2) {
-            glm::ivec2 chunkCoordToCheck = glm::ivec2(x, z) + cameraChunkCoord;
+        glm::ivec2 chunkCoordToCheck = glm::ivec2(x, z) + cameraChunkCoord;
 
-            if (Chunk::DistanceTo(chunkCoordToCheck, cameraChunkCoord) <= viewDistance) {
-                if (!isChunkLoaded(chunkCoordToCheck)) {
-                    generateOrLoadChunkAt(chunkCoordToCheck);
-                    ++chunkCount;
-                }
+        if (Chunk::DistanceTo(chunkCoordToCheck, cameraChunkCoord) <= viewDistance) {
+            if (!isChunkLoaded(chunkCoordToCheck)) {
+                generateOrLoadChunkAt(chunkCoordToCheck);
+                ++chunkCount;
             }
         }
+
         if (x == z || (x < 0 && x == -z) || (x > 0 && x == 1-z)) {
             int32_t t = dx;
             dx = -dz;
             dz = t;
         }
+
         x += dx;
         z += dz;
+    }
+    if (chunkCount == 400) {
+        std::cout << "Build 400 chunks in " << glfwGetTime() - begin << " s\n";
     }
 
     for (auto& [chunkCoord, chunk]: this->chunks) {
