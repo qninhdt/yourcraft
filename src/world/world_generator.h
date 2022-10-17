@@ -19,7 +19,9 @@ public:
 private:
 
     int32_t seed;
-    FastNoiseLite noiseHandle;
+    FastNoiseLite noise1;
+    FastNoiseLite noise2;
+    FastNoiseLite noise3;
 
 };
 

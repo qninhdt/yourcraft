@@ -10,6 +10,7 @@ class Resource {
 public:
 
     static yc::gl::Shader ChunkShader;
+    static yc::gl::Shader SkyBoxShader;
     static yc::gl::Texture GameTexure;
 
     static void Load();

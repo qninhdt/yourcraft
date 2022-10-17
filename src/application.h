@@ -6,6 +6,8 @@
 
 #include "camera.h"
 #include "graphic/display.h"
+#include "graphic/skybox.h"
+#include "world/world.h"
 
 namespace yc {
 
@@ -27,6 +29,7 @@ public:
     yc::graphic::Display* getDisplay();
     GLFWwindow* window;
 
+
 private:
 
     static float deltaTime;
@@ -38,6 +41,8 @@ private:
 
     Camera camera;
     yc::graphic::Display display;
+    yc::graphic::SkyBox skybox;
+    std::shared_ptr<yc::world::World> overworld;
 };
 
 }

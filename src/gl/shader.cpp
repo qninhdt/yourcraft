@@ -5,7 +5,7 @@
 
 namespace yc::gl {
 
-const std::string shaderFolder = "resources/shaders/";
+const std::string shaderFolder = "D:/github/yourcraft/resources/shaders/";
 
 Shader::Shader() {
 

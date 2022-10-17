@@ -56,12 +56,71 @@ Application::Application(uint32_t width, uint32_t height, const std::string& tit
     Resource::Load();
     this->camera.init(this->width, this->height);
     this->display.init();
+    this->skybox.init();
+
+    this->overworld = std::make_shared<yc::world::World>();
+    this->overworld->init();
 }
 
 void Application::process() {
 
+    static float previousTime = glfwGetTime();
+    static int frameCount = 0;
+
+    float currentTime = glfwGetTime();
+    frameCount++;
+    Application::deltaTime = (currentTime-previousTime)/frameCount;
+
+    if (currentTime - previousTime >= 0.05) {
+        std::string s = "Yourcraft - FPS: " + std::to_string(static_cast<int>(1/deltaTime));
+        glfwSetWindowTitle(this->window, s.c_str());
+
+        frameCount = 0;
+        previousTime = currentTime;
+    }
+    
+
+    float cameraSpeed = 1000.0f; // adjust accordingly
+    glm::vec3 new_position = this->getCamera()->getPosition();
+
+    if (glfwGetKey(this->window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) cameraSpeed *= 2;
+
+    if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        this->stop();
+    }
+
+    if (glfwGetKey(this->window, GLFW_KEY_F5) == GLFW_PRESS) {
+        overworld->reloadChunks();
+    }
+
+    if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(this->window, true);
+
+    if (glfwGetKey(this->window, GLFW_KEY_W) == GLFW_PRESS)
+        new_position += cameraSpeed * deltaTime * this->getCamera()->getFront();
+    if (glfwGetKey(this->window, GLFW_KEY_S) == GLFW_PRESS)
+        new_position -= cameraSpeed * deltaTime * this->getCamera()->getFront();
+    if (glfwGetKey(this->window, GLFW_KEY_A) == GLFW_PRESS)
+        new_position -= this->getCamera()->getRight() * cameraSpeed * deltaTime;
+    if (glfwGetKey(this->window, GLFW_KEY_D) == GLFW_PRESS)
+        new_position += this->getCamera()->getRight() * cameraSpeed * deltaTime;
+    if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        new_position += yc::VectorUp * cameraSpeed * deltaTime;
+    if (glfwGetKey(this->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        new_position -= yc::VectorUp * cameraSpeed * deltaTime;
+
+    this->camera.setPosition(new_position);
+
     this->display.prepareFrame();
     this->display.drawFrame();
+
+    yc::Resource::GameTexure.bind();
+    yc::Resource::ChunkShader.use();
+    yc::Resource::ChunkShader.setMat4("projection_view", this->getCamera()->getProjectionViewMatrix());
+
+    overworld->update(*this->getCamera());
+    overworld->render();
+    this->skybox.render(*this->getCamera());  
 
     glfwSwapBuffers(this->window);
     glfwPollEvents();
@@ -142,7 +201,7 @@ Application::~Application() {
     glfwTerminate();
 }
 
-float Application::deltaTime;
+float Application::deltaTime = 1.0f/60;
 
 float Application::GetDeltaTime() {
     return Application::deltaTime;

@@ -37,6 +37,8 @@ public:
     glm::ivec3 getWorldCoord() const;
 
     void setBlockData(const glm::ivec3& coord, BlockData blockData);
+    bool needToBuildMesh;
+    bool firstMeshBuild;
 
 private:
 
@@ -46,8 +48,6 @@ private:
     glm::ivec2 coord;
     std::shared_ptr<World> world;
 
-    bool needToBuildMesh;
-    bool firstMeshBuild;
 };
 
 }

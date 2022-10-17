@@ -8,8 +8,7 @@ uniform mat4 projection_view;
 flat out uvec2 tex_coord;
 out vec2 vert_pos;
 
-void main()
-{
+void main() {
     uint x = bitfieldExtract(vert_data, 0, 5);
     uint y = bitfieldExtract(vert_data, 10, 9);
     uint z = bitfieldExtract(vert_data, 5, 5);

@@ -112,6 +112,12 @@ void BlockVertex::setBlockType(yc::world::BlockType blockType, const glm::ivec3&
                 setTexure(5, 0);
             }
             break;
+        case yc::world::BlockType::STONE:
+            if (faceDirection.y == 1 || faceDirection.y == -1) {
+                setTexure(6, 0);
+            } else {
+                setTexure(7, 0);
+            }
         default:
             break;
     }

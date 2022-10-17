@@ -8,7 +8,9 @@ add_executable(YourCraft
     src/resource.cpp
     src/graphic/display.cpp
     src/graphic/block_vertex.cpp
+    src/graphic/skybox.cpp
     src/gl/mesh.cpp
+    # src/thread_pool.cpp
     src/gl/common.cpp
     src/gl/shader.cpp
     src/gl/texture.cpp

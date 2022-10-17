@@ -44,6 +44,7 @@ void Chunk::buildMeshIfNeeded() {
     }
 }
 
+// TODO: optimize this later
 void Chunk::buildMesh() {
     size_t chunkVerticesSize = 0, chunkIndicesSize = 0;
 
@@ -55,7 +56,7 @@ void Chunk::buildMesh() {
     for (int32_t x=0; x<Chunk::Length; ++x) 
     for (int32_t y=0; y<Chunk::Height; ++y) 
     for (int32_t z=0; z<Chunk::Width; ++z) {
-        const auto& block = this->blocks[x][y][z];
+        const BlockData& block = this->blocks[x][y][z];
         const BlockType blockType = block.getType();
 
         if (blockType == BlockType::AIR) continue;
