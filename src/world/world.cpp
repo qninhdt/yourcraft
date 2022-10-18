@@ -105,22 +105,10 @@ void World::render() {
 }
 
 BlockData World::getBlockDataIfLoadedAt(const glm::ivec3& coord) {
-    glm::ivec2 chunkCoord;
-
     if (coord.y >= 0 && coord.y < 256) {
-        if (coord.x >= 0) {
-            chunkCoord.x = coord.x / Chunk::Length;
-        } else {
-            chunkCoord.x = (coord.x+1) / Chunk::Length - 1;
-        }
-
-        if (coord.z >= 0) {
-            chunkCoord.y = coord.z / Chunk::Width;
-        } else {
-            chunkCoord.y = (coord.z+1) / Chunk::Width - 1;
-        }
-
+        glm::ivec2 chunkCoord = GetChunkCoordOf(coord);
         auto iter = this->chunks.find(chunkCoord);
+
         if (iter != this->chunks.end()) {
             auto chunk = iter->second;
             return chunk->getBlockDataAt({
@@ -154,6 +142,52 @@ std::shared_ptr<Chunk> World::getChunkIfLoadedAt(const glm::ivec2& coord) {
         return iter->second;
     } else {
         return nullptr;
+    }
+}
+
+glm::ivec2 World::GetChunkCoordOf(const glm::ivec3& coord) {
+    glm::ivec2 chunkCoord;
+
+    if (coord.x >= 0) {
+        chunkCoord.x = coord.x / Chunk::Length;
+    } else {
+        chunkCoord.x = (coord.x+1) / Chunk::Length - 1;
+    }
+
+    if (coord.z >= 0) {
+        chunkCoord.y = coord.z / Chunk::Width;
+    } else {
+        chunkCoord.y = (coord.z+1) / Chunk::Width - 1;
+    }
+
+    return chunkCoord;
+}
+
+bool World::destroyBlockIfLoaded(const glm::ivec3& coord) {
+    return setBlockDataIfLoadedAt(coord, { yc::world::BlockType::AIR });
+}
+
+bool World::setBlockDataIfLoadedAt(const glm::ivec3& coord, const BlockData& blockData) {
+    if (coord.y<0 || coord.y>=256) return false;
+
+    glm::ivec2 chunkCoord = GetChunkCoordOf(coord);
+
+    auto iter = this->chunks.find(chunkCoord);
+
+    if (iter != this->chunks.end()) {
+        auto chunk = iter->second;
+
+        chunk->setBlockData({
+            util::PositiveMod(coord.x, Chunk::Length),
+            coord.y,
+            util::PositiveMod(coord.z, Chunk::Width)
+        }, blockData);
+
+        chunk->prepareToBuildMesh();
+
+        return true;
+    } else {    
+        return false;
     }
 }
 

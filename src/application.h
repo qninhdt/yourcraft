@@ -42,6 +42,7 @@ private:
     std::string title;
 
     glm::ivec3 selectingBlockCoord;
+    glm::ivec3 selectingFace;
     bool selectingBlock;
 
     Camera camera;

@@ -17,6 +17,8 @@ public:
         size_t operator() (const glm::ivec2& coord) const noexcept;
     };
 
+    static glm::ivec2 GetChunkCoordOf(const glm::ivec3& coord);
+
     World();
 
     void init();
@@ -26,6 +28,10 @@ public:
     void render();
 
     BlockData getBlockDataIfLoadedAt(const glm::ivec3& coord);
+
+    bool setBlockDataIfLoadedAt(const glm::ivec3& coord, const BlockData& blockData);
+    
+    bool destroyBlockIfLoaded(const glm::ivec3& coord);
 
     std::shared_ptr<Chunk> getChunkIfLoadedAt(const glm::ivec2& coord);
 
