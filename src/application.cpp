@@ -113,6 +113,19 @@ void Application::process() {
         new_position += yc::VectorUp * cameraSpeed * deltaTime;
     if (glfwGetKey(this->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         new_position -= yc::VectorUp * cameraSpeed * deltaTime;
+    if (glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+        if (this->selectingBlock) {
+            this->overworld->setBlockDataIfLoadedAt(
+                this->selectingBlockCoord + this->selectingFace,
+                { world::BlockType::STONE }
+            );
+        }
+    }
+    if (glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+        if (this->selectingBlock) {
+            this->overworld->destroyBlockIfLoaded(this->selectingBlockCoord);
+        }
+    }
 
     this->camera.setPosition(new_position);
 
@@ -156,8 +169,6 @@ void Application::process() {
 
     float radius = 500.0/sqrt(dx*dx+dy*dy+dz*dz);
 
-    glm::vec3 face;
-
     while (true) {
         yc::world::BlockData block = this->overworld->getBlockDataIfLoadedAt({ x, y, z });
         yc::world::BlockType blockType = block.getType();
@@ -168,7 +179,6 @@ void Application::process() {
         } else if (blockType != yc::world::BlockType::AIR) {
             this->selectingBlock = true;
             this->selectingBlockCoord = { x, y, z };
-            // std::cout << face.x << ' ' << face.y << ' ' << face.z << '\n';
             break;
         }
 
@@ -180,34 +190,34 @@ void Application::process() {
                 // Adjust tMaxX to the next X-oriented boundary crossing.
                 tMaxX += tDeltaX;
                 // Record the normal vector of the cube face we entered.
-                face[0] = -stepX;
-                face[1] = 0;
-                face[2] = 0;
+                this->selectingFace[0] = -stepX;
+                this->selectingFace[1] = 0;
+                this->selectingFace[2] = 0;
             } else {
                 if (tMaxZ > radius) { this->selectingBlock = false; break; }
                 z += stepZ;
                 tMaxZ += tDeltaZ;
-                face[0] = 0;
-                face[1] = 0;
-                face[2] = -stepZ;
+                this->selectingFace[0] = 0;
+                this->selectingFace[1] = 0;
+                this->selectingFace[2] = -stepZ;
             }
             } else {
             if (tMaxY < tMaxZ) {
                 if (tMaxY > radius) { this->selectingBlock = false; break; }
                 y += stepY;
                 tMaxY += tDeltaY;
-                face[0] = 0;
-                face[1] = -stepY;
-                face[2] = 0;
+                this->selectingFace[0] = 0;
+                this->selectingFace[1] = -stepY;
+                this->selectingFace[2] = 0;
             } else {
                 // Identical to the second case, repeated for simplicity in
                 // the conditionals.
                 if (tMaxZ > radius) { this->selectingBlock = false; break; }
                 z += stepZ;
                 tMaxZ += tDeltaZ;
-                face[0] = 0;
-                face[1] = 0;
-                face[2] = -stepZ;
+                this->selectingFace[0] = 0;
+                this->selectingFace[1] = 0;
+                this->selectingFace[2] = -stepZ;
             }
         }
     }
