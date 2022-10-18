@@ -54,6 +54,10 @@ void Camera::setPosition(glm::vec3 postion) {
     updateMatrix();
 }
 
+glm::vec3 Camera::getDirection() const {
+    return m_direction;
+}
+
 void Camera::setOrientation(float pitch, float yaw) {
     pitch = std::max(pitch, -89.0f);
     pitch = std::min(pitch, +89.0f);

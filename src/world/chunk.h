@@ -47,7 +47,7 @@ private:
 
     glm::ivec2 coord;
     std::shared_ptr<World> world;
-
+    
 };
 
 }

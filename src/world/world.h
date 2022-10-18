@@ -1,8 +1,8 @@
 #pragma once
 
 #include <unordered_map>
+#include <unordered_set>
 #include <map>
-#include "thread_pool.h"
 #include "world/world_generator.h"
 #include "world/chunk.h"
 #include "camera.h"
@@ -44,11 +44,9 @@ public:
 private:
 
     std::unordered_map<glm::ivec2, std::shared_ptr<Chunk>, HashChunkCoord> chunks;
-    std::mutex chunksLock;
 
     WorldGenerator generator;
 
-    ThreadPool chunkPool;
 };
 
 }

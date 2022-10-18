@@ -18,8 +18,10 @@ void Mesh::unbind() {
 
 void Mesh::draw() {
     glDrawElements(GL_TRIANGLES, this->indicesCount, GL_UNSIGNED_INT, 0);
+}
 
-
+void Mesh::drawLine() {
+    glDrawElements(GL_LINES, this->indicesCount, GL_UNSIGNED_INT, 0);
 }
 
 void Mesh::addIndices(const std::vector<uint32_t>& indices) {

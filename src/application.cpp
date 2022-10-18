@@ -4,6 +4,8 @@
 #include "application.h"
 #include "resource.h"
 #include "world/chunk.h"
+#include "world/block.h"
+#include "util/math.h"
 
 namespace yc {
 
@@ -11,10 +13,11 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 void sizeCallback(GLFWwindow* window, int width, int height);
 
-Application::Application(uint32_t width, uint32_t height, const std::string& title):
+Application::Application(int32_t width, int32_t height, const std::string& title):
     width(width),
     height(height),
     title(title),
+    selectingBlock(false),
     stopped(false) {
 
     // init GLFW
@@ -57,6 +60,8 @@ Application::Application(uint32_t width, uint32_t height, const std::string& tit
     this->camera.init(this->width, this->height);
     this->display.init();
     this->skybox.init();
+    this->blockOutline.init();
+    this->crosshair.init(this->width, this->height);
 
     this->overworld = std::make_shared<yc::world::World>();
     this->overworld->init();
@@ -80,10 +85,10 @@ void Application::process() {
     }
     
 
-    float cameraSpeed = 1000.0f; // adjust accordingly
+    float cameraSpeed = 20.0f; // adjust accordingly
     glm::vec3 new_position = this->getCamera()->getPosition();
 
-    if (glfwGetKey(this->window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) cameraSpeed *= 2;
+    if (glfwGetKey(this->window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) cameraSpeed *= 10;
 
     if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         this->stop();
@@ -120,7 +125,94 @@ void Application::process() {
 
     overworld->update(*this->getCamera());
     overworld->render();
-    this->skybox.render(*this->getCamera());  
+    this->skybox.render(*this->getCamera());
+
+    this->crosshair.render();
+
+    if (this->selectingBlock) {
+        this->blockOutline.render(*this->getCamera(), this->selectingBlockCoord); 
+    }
+
+    // begin shit
+    auto coord = this->camera.getPosition();
+    auto direction = this->camera.getDirection();
+    float x = floor(coord.x);
+    float y = floor(coord.y);
+    float z = floor(coord.z);
+    float dx = direction.x;
+    float dy = direction.y;
+    float dz = direction.z;
+    int32_t stepX = util::SignNum(dx);
+    int32_t stepY = util::SignNum(dy);
+    int32_t stepZ = util::SignNum(dz);
+
+    float tMaxX = util::IntBound(coord.x, dx);
+    float tMaxY = util::IntBound(coord.y, dy);
+    float tMaxZ = util::IntBound(coord.z, dz);
+
+    float tDeltaX = stepX/dx;
+    float tDeltaY = stepY/dy;
+    float tDeltaZ = stepZ/dz;
+
+    float radius = 500.0/sqrt(dx*dx+dy*dy+dz*dz);
+
+    glm::vec3 face;
+
+    while (true) {
+        yc::world::BlockData block = this->overworld->getBlockDataIfLoadedAt({ x, y, z });
+        yc::world::BlockType blockType = block.getType();
+
+        if (blockType == yc::world::BlockType::NONE) {
+            this->selectingBlock = false;
+            break;
+        } else if (blockType != yc::world::BlockType::AIR) {
+            this->selectingBlock = true;
+            this->selectingBlockCoord = { x, y, z };
+            // std::cout << face.x << ' ' << face.y << ' ' << face.z << '\n';
+            break;
+        }
+
+        if (tMaxX < tMaxY) {
+            if (tMaxX < tMaxZ) {
+                if (tMaxX > radius) { this->selectingBlock = false; break; }
+                // Update which cube we are now in.
+                x += stepX;
+                // Adjust tMaxX to the next X-oriented boundary crossing.
+                tMaxX += tDeltaX;
+                // Record the normal vector of the cube face we entered.
+                face[0] = -stepX;
+                face[1] = 0;
+                face[2] = 0;
+            } else {
+                if (tMaxZ > radius) { this->selectingBlock = false; break; }
+                z += stepZ;
+                tMaxZ += tDeltaZ;
+                face[0] = 0;
+                face[1] = 0;
+                face[2] = -stepZ;
+            }
+            } else {
+            if (tMaxY < tMaxZ) {
+                if (tMaxY > radius) { this->selectingBlock = false; break; }
+                y += stepY;
+                tMaxY += tDeltaY;
+                face[0] = 0;
+                face[1] = -stepY;
+                face[2] = 0;
+            } else {
+                // Identical to the second case, repeated for simplicity in
+                // the conditionals.
+                if (tMaxZ > radius) { this->selectingBlock = false; break; }
+                z += stepZ;
+                tMaxZ += tDeltaZ;
+                face[0] = 0;
+                face[1] = 0;
+                face[2] = -stepZ;
+            }
+        }
+    }
+
+    // end shit
 
     glfwSwapBuffers(this->window);
     glfwPollEvents();

@@ -7,7 +7,9 @@
 #include "camera.h"
 #include "graphic/display.h"
 #include "graphic/skybox.h"
+#include "graphic/block_outline.h"
 #include "world/world.h"
+#include "graphic/crosshair.h"
 
 namespace yc {
 
@@ -16,7 +18,7 @@ class Application {
 public:
     static float GetDeltaTime();
 
-    Application(uint32_t width, uint32_t height, const std::string& title);
+    Application(int32_t width, int32_t height, const std::string& title);
     ~Application();
 
     bool isStopped();
@@ -39,9 +41,14 @@ private:
     uint32_t height;
     std::string title;
 
+    glm::ivec3 selectingBlockCoord;
+    bool selectingBlock;
+
     Camera camera;
     yc::graphic::Display display;
     yc::graphic::SkyBox skybox;
+    yc::graphic::BlockOutline blockOutline;
+    yc::graphic::CrossHair crosshair;
     std::shared_ptr<yc::world::World> overworld;
 };
 

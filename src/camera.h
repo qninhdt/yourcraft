@@ -23,6 +23,7 @@ public:
     glm::vec3 getFront() const;
     glm::vec3 getPosition() const;
     void setPosition(glm::vec3 position);
+    glm::vec3 getDirection() const;
     
 private:
     glm::vec3 m_position;

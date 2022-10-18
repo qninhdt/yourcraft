@@ -10,11 +10,11 @@ add_executable(YourCraft
     src/graphic/block_vertex.cpp
     src/graphic/skybox.cpp
     src/gl/mesh.cpp
-    # src/thread_pool.cpp
     src/gl/common.cpp
     src/gl/shader.cpp
     src/gl/texture.cpp
     src/gl/shader.cpp
+    src/graphic/block_outline.cpp
     src/world/chunk.cpp
     src/world/block.cpp
     src/world/world.cpp

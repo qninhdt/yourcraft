@@ -15,6 +15,7 @@ public:
     void bind();
     void unbind();
     void draw();
+    void drawLine();
     void addIndices(const std::vector<uint32_t>& indices);
     void addIndices(const uint32_t* indices, size_t indicesSize);
     void updateIndices(const std::vector<uint32_t>& indices);

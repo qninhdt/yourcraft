@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stdint.h"
+#include <cmath>
 
 namespace yc::util {
 
@@ -13,4 +14,12 @@ namespace yc::util {
 
         return m;
     }
+
+    static int32_t SignNum(float num) {
+        return num>0 ? 1 : num<0 ? -1 : 0;
+    }
+
+     static float IntBound(float s, float ds) {
+        return (ds>0 ? ceil(s)-s : s-floor(s))/abs(ds);
+     }
 }
