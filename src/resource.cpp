@@ -14,8 +14,8 @@ void Resource::Load() {
     Resource::SkyBoxShader.loadFromFile("skybox.vert", "skybox.frag");
     Resource::BlockOutlineShader.loadFromFile("block_outline.vert", "block_outline.frag");
     Resource::CrossHairShader.loadFromFile("crosshair.vert", "crosshair.frag");
-    Resource::GameTexure.loadFromFile("D:/github/yourcraft/resources/texture.png");
-    Resource::CrossHairTexture.loadFromFile("D:/github/yourcraft/resources/crosshair.png");
+    Resource::GameTexure.loadFromFile("E:/github/yourcraft/resources/texture.png");
+    Resource::CrossHairTexture.loadFromFile("E:/github/yourcraft/resources/crosshair.png");
 }
 
 }

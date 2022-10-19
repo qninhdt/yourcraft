@@ -68,12 +68,12 @@ void SkyBox::init() {
 
     int32_t width, height, nrChannels;
     const std::string faces[] = {
-        "D:/github/yourcraft/resources/skybox/right.jpg",
-        "D:/github/yourcraft/resources/skybox/left.jpg",
-        "D:/github/yourcraft/resources/skybox/top.jpg",
-        "D:/github/yourcraft/resources/skybox/bottom.jpg",
-        "D:/github/yourcraft/resources/skybox/front.jpg",
-        "D:/github/yourcraft/resources/skybox/back.jpg"
+        "E:/github/yourcraft/resources/skybox/right.jpg",
+        "E:/github/yourcraft/resources/skybox/left.jpg",
+        "E:/github/yourcraft/resources/skybox/top.jpg",
+        "E:/github/yourcraft/resources/skybox/bottom.jpg",
+        "E:/github/yourcraft/resources/skybox/front.jpg",
+        "E:/github/yourcraft/resources/skybox/back.jpg"
     };
 
     stbi_set_flip_vertically_on_load(false);
