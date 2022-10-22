@@ -63,7 +63,7 @@ Application::Application(int32_t width, int32_t height, const std::string& title
     this->blockOutline.init();
     this->crosshair.init(this->width, this->height);
 
-    this->overworld = std::make_shared<yc::world::World>();
+    this->overworld = std::make_shared<yc::world::World>(&persistence);
     this->overworld->init();
 }
 
@@ -85,10 +85,10 @@ void Application::process() {
     }
     
 
-    float cameraSpeed = 20.0f; // adjust accordingly
+    float cameraSpeed = 100.0f; // adjust accordingly
     glm::vec3 new_position = this->getCamera()->getPosition();
 
-    if (glfwGetKey(this->window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) cameraSpeed *= 10;
+    if (glfwGetKey(this->window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) cameraSpeed *= 2;
 
     if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         this->stop();
@@ -201,7 +201,7 @@ void Application::process() {
                 this->selectingFace[1] = 0;
                 this->selectingFace[2] = -stepZ;
             }
-            } else {
+        } else {
             if (tMaxY < tMaxZ) {
                 if (tMaxY > radius) { this->selectingBlock = false; break; }
                 y += stepY;
@@ -221,8 +221,6 @@ void Application::process() {
             }
         }
     }
-
-    // end shit
 
     glfwSwapBuffers(this->window);
     glfwPollEvents();
@@ -266,6 +264,10 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
         }
     }
+
+    if (glfwGetKey(app->window, GLFW_KEY_F1) == GLFW_PRESS) {
+        app->overworld->saveChunks();
+    }
 }
 
 void mouseCallback(GLFWwindow* window, double xpos, double ypos) {
@@ -300,13 +302,17 @@ void Application::stop() {
 }
 
 Application::~Application() {
-    glfwTerminate();
 }
 
 float Application::deltaTime = 1.0f/60;
 
 float Application::GetDeltaTime() {
     return Application::deltaTime;
+}
+
+void Application::terminate() {
+    this->overworld->saveChunks();
+    glfwTerminate();
 }
 
 }

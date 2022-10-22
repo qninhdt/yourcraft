@@ -29,7 +29,9 @@ public:
     std::string getTitle();
     Camera* getCamera();
     yc::graphic::Display* getDisplay();
+    void terminate();
     GLFWwindow* window;
+    std::shared_ptr<yc::world::World> overworld;
 
 
 private:
@@ -50,7 +52,7 @@ private:
     yc::graphic::SkyBox skybox;
     yc::graphic::BlockOutline blockOutline;
     yc::graphic::CrossHair crosshair;
-    std::shared_ptr<yc::world::World> overworld;
+    Persistence persistence;
 };
 
 }

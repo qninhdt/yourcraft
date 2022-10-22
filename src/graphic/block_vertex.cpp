@@ -146,10 +146,6 @@ void BlockVertex::setCoordinate(uint32_t x, uint32_t y, uint32_t z) {
 void BlockVertex::moveCoordinate(int32_t dx, int32_t dy, int32_t dz) {
     glm::uvec3 pos = getCoordinate();
 
-    assert(pos.x+dx >= 0 && pos.x+dx <= 16);
-    assert(pos.y+dy >= 0 && pos.y+dy <= 256);
-    assert(pos.z+dz >= 0 && pos.z+dz <= 16);
-
     this->data += dx << 0;
     this->data += dz << 5;
     this->data += dy << 10;

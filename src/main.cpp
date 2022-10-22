@@ -1,5 +1,4 @@
 // #pragma GCC optimize ("O3")
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "gl/shader.h"
@@ -15,17 +14,20 @@
 #include "world/world_generator.h"
 #include "util/math.h"
 #include "graphic/skybox.h"
+#include "persistence.h"
 
 int main()
 {
     yc::Application app(1600, 800, "Yourcraft");
 
-    app.getCamera()->setPosition({ 0, 52, 0 });
-    app.getCamera()->setOrientation(-89, 0);
+    app.getCamera()->setOrientation(-89, 45);
+    app.getCamera()->setPosition({ 0, 70, 0 });
 
     while (!app.isStopped()) {
         app.process();
     }
+
+    app.terminate();
 
     return 0;
 }

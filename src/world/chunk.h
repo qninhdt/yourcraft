@@ -3,6 +3,7 @@
 #include "world/block.h"
 #include "gl/mesh.h"
 
+
 namespace yc::world {
 
 class World;
@@ -32,9 +33,13 @@ public:
 
     BlockData getBlockDataAt(const glm::ivec3& coord);
 
+    glm::ivec2 getCoord() const;
+
     glm::ivec3 getWorldCoordOfBlock(const glm::ivec3& blockCoord);
 
     glm::ivec3 getWorldCoord() const;
+
+    BlockData* getChunkData();
 
     void setBlockData(const glm::ivec3& coord, BlockData blockData);
     bool needToBuildMesh;

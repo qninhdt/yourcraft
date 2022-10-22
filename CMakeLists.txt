@@ -19,8 +19,11 @@ add_executable(YourCraft
     src/world/block.cpp
     src/world/world.cpp
     src/world/world_generator.cpp
+    src/persistence.cpp
     deps/glad/src/glad.c
 )
+
+# target_compile_options(YourCraft PRIVATE -Wall -Wextra -Wpedantic -Werror)
 
 target_link_libraries(YourCraft ${CMAKE_SOURCE_DIR}/build/glfw3.dll)
 include_directories(src)

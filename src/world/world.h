@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 #include <unordered_set>
-#include <map>
+#include "persistence.h"
 #include "world/world_generator.h"
 #include "world/chunk.h"
 #include "camera.h"
@@ -19,7 +19,7 @@ public:
 
     static glm::ivec2 GetChunkCoordOf(const glm::ivec3& coord);
 
-    World();
+    World(Persistence* persistence);
 
     void init();
 
@@ -43,6 +43,8 @@ public:
 
     void reloadChunks();
 
+    void saveChunks();
+
     int32_t getSeed() const;
 
     std::shared_ptr<FastNoiseLite> getNoiseHandle() const;
@@ -52,7 +54,7 @@ private:
     std::unordered_map<glm::ivec2, std::shared_ptr<Chunk>, HashChunkCoord> chunks;
 
     WorldGenerator generator;
-
+    Persistence* persistence;
 };
 
 }

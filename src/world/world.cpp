@@ -8,7 +8,9 @@
 
 namespace yc::world {
 
-World::World(): generator(240404) {}
+World::World(Persistence* persistence):
+    generator(240404),
+    persistence(persistence) {}
 
 void World::init() {
 }
@@ -20,11 +22,17 @@ void World::update(const yc::Camera& camera) {
     };
 
     const int32_t viewDistance = 32;
-    for (auto& [chunkCoord, chunk]: this->chunks) {
+    std::vector<std::shared_ptr<Chunk>> shouldBeUnloadedChunks;
+    for (const auto& [chunkCoord, chunk]: this->chunks) {
         if (Chunk::DistanceTo(chunkCoord, cameraChunkCoord) > viewDistance) {
-            this->unloadChunk(chunkCoord);
+            shouldBeUnloadedChunks.push_back(chunk);
         }
     }
+
+    for(const auto& chunk: shouldBeUnloadedChunks) {
+        unloadChunk(chunk->getCoord());
+    }
+    persistence->syncRegionFiles();
 
     std::atomic_int chunkCount = 0;
     const int32_t maxChunksLoadPerFrame = 4;
@@ -55,20 +63,18 @@ void World::update(const yc::Camera& camera) {
         z += dz;
     }
 
-    // if (chunkCount == 400) {
-    //     std::cout << "Build 400 chunks in " << glfwGetTime() - begin << " s\n";
-    // }
-    for (auto& [chunkCoord, chunk]: this->chunks) {
+    for (const auto& [chunkCoord, chunk]: this->chunks) {
         chunk->buildMeshIfNeeded();
     }
 }
 
 void World::generateOrLoadChunkAt(const glm::ivec2& chunkCoord) {
-    auto chunk = this->generator.generateChunk(
-        shared_from_this(),
-        chunkCoord
-    );
+    auto chunk = persistence->getChunk(chunkCoord, shared_from_this());
 
+    if (chunk == nullptr) {
+        chunk = this->generator.generateChunk(shared_from_this(), chunkCoord);
+    }
+    
     const std::array<glm::ivec2, 4> neighborChunks = {{
         { +1, 0 },
         { -1, 0 },
@@ -88,6 +94,7 @@ void World::generateOrLoadChunkAt(const glm::ivec2& chunkCoord) {
 }
 
 void World::unloadChunk(const glm::ivec2& chunkCoord) {
+    persistence->saveChunk(this->chunks[chunkCoord]);
     this->chunks.erase(chunkCoord);
 }
 
@@ -102,6 +109,14 @@ void World::render() {
         Resource::ChunkShader.setMat4("model", model);
         chunk->render();
     }
+}
+
+void World::saveChunks() {
+    std::cout << "Saving world . . .\n";
+    for (auto& [coord, chunk]: this->chunks) {
+        persistence->saveChunk(chunk);
+    }
+    persistence->syncRegionFiles();
 }
 
 BlockData World::getBlockDataIfLoadedAt(const glm::ivec3& coord) {
@@ -131,7 +146,7 @@ void World::reloadChunks() {
     }
     double end = glfwGetTime();
 
-    std::cout << "Reload: " << end - begin << " s\n";
+    std::cout << "Reloaded chunks in " << end - begin << " s\n";
 }
 
 // no thread-safe

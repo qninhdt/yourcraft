@@ -25,6 +25,10 @@ Chunk::Chunk() {
     this->firstMeshBuild = true;
 }
 
+BlockData* Chunk::getChunkData() {
+    return &this->blocks[0][0][0];
+}
+
 void Chunk::prepareToBuildMesh() {
     this->needToBuildMesh = true;
 }
@@ -127,6 +131,10 @@ void Chunk::buildMesh() {
     this->needToBuildMesh = false;
 }
 
+glm::ivec2 Chunk::getCoord() const {
+    return this->coord;
+}
+
 glm::ivec3 Chunk::getWorldCoordOfBlock(const glm::ivec3& blockCoord) {
     assert(blockCoord.x>=0 && blockCoord.x<Chunk::Length);
     assert(blockCoord.y>=0 && blockCoord.y<Chunk::Height);
@@ -159,8 +167,12 @@ void Chunk::setBlockData(const glm::ivec3& coord, BlockData blockData) {
 }
 
 int32_t Chunk::DistanceTo(const glm::ivec2& chunkCoord, const glm::ivec2& coord) {
-    return sqrt((chunkCoord.x-coord.x)*(chunkCoord.x-coord.x)
-        + (chunkCoord.y-coord.y)*(chunkCoord.y-coord.y));
+    
+    return sqrt(
+        (chunkCoord.x-coord.x)
+        *(chunkCoord.x-coord.x)
+        + (chunkCoord.y-coord.y)
+        *(chunkCoord.y-coord.y));
 }
 
 }
