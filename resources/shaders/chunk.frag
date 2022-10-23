@@ -16,7 +16,7 @@ void main() {
     coord.y += (vert_pos.y) * sprite_size;
     vec4 color = texture(game_texture, coord);
 
-    if (color.w < 0.3) {
+    if (color.w == 0) {
         discard;
     }
 

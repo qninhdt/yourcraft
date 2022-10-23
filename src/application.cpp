@@ -12,13 +12,11 @@ namespace yc {
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 void sizeCallback(GLFWwindow* window, int width, int height);
+void mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods);
 
 Application::Application(int32_t width, int32_t height, const std::string& title):
-    width(width),
-    height(height),
-    title(title),
-    selectingBlock(false),
-    stopped(false) {
+    stopped(false),
+    display(width, height) {
 
     // init GLFW
     glfwInit();
@@ -30,15 +28,15 @@ Application::Application(int32_t width, int32_t height, const std::string& title
     stbi_set_flip_vertically_on_load(true); 
 
     // create window
-    this->window = glfwCreateWindow(this->width, this->height, this->title.c_str(), NULL, NULL);
+    window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
 
-    if (this->window == NULL) {
+    if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
 
-    glfwMakeContextCurrent(this->window);
+    glfwMakeContextCurrent(window);
 
     // init opengl
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
@@ -46,25 +44,28 @@ Application::Application(int32_t width, int32_t height, const std::string& title
         exit(EXIT_FAILURE);
     }
 
-    glfwSetWindowUserPointer(this->window, this);
+    glfwSetWindowUserPointer(window, this);
 
     // callback
-    glfwSetKeyCallback(this->window, keyCallback);
-    glfwSetCursorPosCallback(this->window, mouseCallback);
-    glfwSetFramebufferSizeCallback(this->window, sizeCallback);
+    glfwSetKeyCallback(window, keyCallback);
+    glfwSetMouseButtonCallback(window, mouseButtonCallBack);
+    glfwSetCursorPosCallback(window, mouseCallback);
+    glfwSetFramebufferSizeCallback(window, sizeCallback);
 
     // disable cursor
-    glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
 
     Resource::Load();
-    this->camera.init(this->width, this->height);
-    this->display.init();
-    this->skybox.init();
-    this->blockOutline.init();
-    this->crosshair.init(this->width, this->height);
 
-    this->overworld = std::make_shared<yc::world::World>(&persistence);
-    this->overworld->init();
+    persistence = new Persistence();
+    
+    world = new yc::world::World(persistence);
+    world->init();
+
+    player = new Player(50.0f, world);
+    player->init(width, height);
+
+    display.init();
 }
 
 void Application::process() {
@@ -75,179 +76,61 @@ void Application::process() {
     float currentTime = glfwGetTime();
     frameCount++;
     Application::deltaTime = (currentTime-previousTime)/frameCount;
-
+    
     if (currentTime - previousTime >= 0.05) {
         std::string s = "Yourcraft - FPS: " + std::to_string(static_cast<int>(1/deltaTime));
-        glfwSetWindowTitle(this->window, s.c_str());
+        glfwSetWindowTitle(window, s.c_str());
 
         frameCount = 0;
         previousTime = currentTime;
     }
-    
 
-    float cameraSpeed = 50.0f; // adjust accordingly
-    glm::vec3 new_position = this->getCamera()->getPosition();
-
-    if (glfwGetKey(this->window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) cameraSpeed *= 2;
-
-    if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        this->stop();
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        stop();
     }
 
-    if (glfwGetKey(this->window, GLFW_KEY_F5) == GLFW_PRESS) {
-        overworld->reloadChunks();
+    if (glfwGetKey(window, GLFW_KEY_F5) == GLFW_PRESS) {
+        world->reloadChunks();
     }
 
-    if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(this->window, true);
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
 
-    if (glfwGetKey(this->window, GLFW_KEY_W) == GLFW_PRESS)
-        new_position += cameraSpeed * deltaTime * this->getCamera()->getFront();
-    if (glfwGetKey(this->window, GLFW_KEY_S) == GLFW_PRESS)
-        new_position -= cameraSpeed * deltaTime * this->getCamera()->getFront();
-    if (glfwGetKey(this->window, GLFW_KEY_A) == GLFW_PRESS)
-        new_position -= this->getCamera()->getRight() * cameraSpeed * deltaTime;
-    if (glfwGetKey(this->window, GLFW_KEY_D) == GLFW_PRESS)
-        new_position += this->getCamera()->getRight() * cameraSpeed * deltaTime;
-    if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        new_position += yc::VectorUp * cameraSpeed * deltaTime;
-    if (glfwGetKey(this->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        new_position -= yc::VectorUp * cameraSpeed * deltaTime;
-    if (glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-        if (this->selectingBlock) {
-            this->overworld->setBlockDataIfLoadedAt(
-                this->selectingBlockCoord + this->selectingFace,
-                { world::BlockType::WATER }
-            );
-        }
-    }
-    if (glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-        if (this->selectingBlock) {
-            this->overworld->destroyBlockIfLoaded(this->selectingBlockCoord);
-        }
-    }
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        player->moveFront();
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        player->moveBack();
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        player->moveLeft();
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        player->moveRight();
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        player->moveUp();
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        player->moveDown();
 
-    this->camera.setPosition(new_position);
+    player->update();
+    world->update(player->getCamera());
 
-    this->display.prepareFrame();
-    this->display.drawFrame();
+    display.prepareFrame();
 
-    yc::Resource::GameTexure.bind();
-    yc::Resource::ChunkShader.use();
-    yc::Resource::ChunkShader.setMat4("projection_view", this->getCamera()->getProjectionViewMatrix());
+    world->render(player->getCamera());
+    display.drawFrame(player);
 
-    overworld->update(*this->getCamera());
-    overworld->render();
-    this->skybox.render(*this->getCamera());
-
-    this->crosshair.render();
-
-    if (this->selectingBlock) {
-        this->blockOutline.render(*this->getCamera(), this->selectingBlockCoord); 
-    }
-
-    // begin shit
-    auto coord = this->camera.getPosition();
-    auto direction = this->camera.getDirection();
-    float x = floor(coord.x);
-    float y = floor(coord.y);
-    float z = floor(coord.z);
-    float dx = direction.x;
-    float dy = direction.y;
-    float dz = direction.z;
-    int32_t stepX = util::SignNum(dx);
-    int32_t stepY = util::SignNum(dy);
-    int32_t stepZ = util::SignNum(dz);
-
-    float tMaxX = util::IntBound(coord.x, dx);
-    float tMaxY = util::IntBound(coord.y, dy);
-    float tMaxZ = util::IntBound(coord.z, dz);
-
-    float tDeltaX = stepX/dx;
-    float tDeltaY = stepY/dy;
-    float tDeltaZ = stepZ/dz;
-
-    float radius = 500.0/sqrt(dx*dx+dy*dy+dz*dz);
-
-    while (true) {
-        yc::world::BlockData block = this->overworld->getBlockDataIfLoadedAt({ x, y, z });
-        yc::world::BlockType blockType = block.getType();
-
-        if (blockType == yc::world::BlockType::NONE) {
-            this->selectingBlock = false;
-            break;
-        } else if (blockType != yc::world::BlockType::AIR) {
-            this->selectingBlock = true;
-            this->selectingBlockCoord = { x, y, z };
-            break;
-        }
-
-        if (tMaxX < tMaxY) {
-            if (tMaxX < tMaxZ) {
-                if (tMaxX > radius) { this->selectingBlock = false; break; }
-                // Update which cube we are now in.
-                x += stepX;
-                // Adjust tMaxX to the next X-oriented boundary crossing.
-                tMaxX += tDeltaX;
-                // Record the normal vector of the cube face we entered.
-                this->selectingFace[0] = -stepX;
-                this->selectingFace[1] = 0;
-                this->selectingFace[2] = 0;
-            } else {
-                if (tMaxZ > radius) { this->selectingBlock = false; break; }
-                z += stepZ;
-                tMaxZ += tDeltaZ;
-                this->selectingFace[0] = 0;
-                this->selectingFace[1] = 0;
-                this->selectingFace[2] = -stepZ;
-            }
-        } else {
-            if (tMaxY < tMaxZ) {
-                if (tMaxY > radius) { this->selectingBlock = false; break; }
-                y += stepY;
-                tMaxY += tDeltaY;
-                this->selectingFace[0] = 0;
-                this->selectingFace[1] = -stepY;
-                this->selectingFace[2] = 0;
-            } else {
-                // Identical to the second case, repeated for simplicity in
-                // the conditionals.
-                if (tMaxZ > radius) { this->selectingBlock = false; break; }
-                z += stepZ;
-                tMaxZ += tDeltaZ;
-                this->selectingFace[0] = 0;
-                this->selectingFace[1] = 0;
-                this->selectingFace[2] = -stepZ;
-            }
-        }
-    }
-
-    glfwSwapBuffers(this->window);
+    glfwSwapBuffers(window);
     glfwPollEvents();
 }
 
 yc::graphic::Display* Application::getDisplay() {
-    return &this->display;
-}
-
-uint32_t Application::getWidth() {
-    return this->width;
-}
-
-uint32_t Application::getHeight() {
-    return this->height;
-}
-
-std::string Application::getTitle() {
-    return this->title;
+    return &display;
 }
 
 bool Application::isStopped() {
-    return this->stopped;
+    return stopped;
 }
 
-Camera* Application::getCamera() {
-    return &this->camera;
+Player* Application::getPlayer() {
+    return player;
 }
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -266,15 +149,15 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     }
 
     if (glfwGetKey(app->window, GLFW_KEY_F1) == GLFW_PRESS) {
-        app->overworld->saveChunks();
+        app->world->saveChunks();
     }
 }
 
 void mouseCallback(GLFWwindow* window, double xpos, double ypos) {
     Application* app = (Application*) glfwGetWindowUserPointer(window);
 
-    static float lastX = app->getWidth() / 2;
-    static float lastY = app->getWidth() / 2;
+    static float lastX = app->getDisplay()->getWidth() / 2;
+    static float lastY = app->getDisplay()->getHeight() / 2;
 
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos; 
@@ -285,11 +168,30 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos) {
     xoffset *= sensitivity;
     yoffset *= sensitivity;
 
-    Camera* camera = app->getCamera();
+    Camera* camera = app->player->getCamera();
     camera->setOrientation(
         camera->getPitch() + yoffset,
         camera->getYaw() + xoffset
     );
+}
+
+void mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods) {
+    Application* app = (Application*) glfwGetWindowUserPointer(window);
+
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+        if (app->player->isSelectingBlock()) {
+            app->world->setBlockDataIfLoadedAt(
+                app->player->getSelectingBlock() + app->player->getSelectingFace(),
+                { world::BlockType::GLASS }
+            );
+        }
+    }
+
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        if (app->player->isSelectingBlock()) {
+            app->world->destroyBlockIfLoaded(app->player->getSelectingBlock());
+        }
+    }
 }
 
 void sizeCallback(GLFWwindow* window, int width, int height) {
@@ -297,8 +199,8 @@ void sizeCallback(GLFWwindow* window, int width, int height) {
 }
 
 void Application::stop() {
-    this->stopped = true;
-    glfwSetWindowShouldClose(this->window, true);
+    stopped = true;
+    glfwSetWindowShouldClose(window, true);
 }
 
 Application::~Application() {
@@ -311,7 +213,7 @@ float Application::GetDeltaTime() {
 }
 
 void Application::terminate() {
-    this->overworld->saveChunks();
+    world->saveChunks();
     glfwTerminate();
 }
 

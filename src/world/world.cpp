@@ -15,10 +15,10 @@ World::World(Persistence* persistence):
 void World::init() {
 }
 
-void World::update(const yc::Camera& camera) {
+void World::update(yc::Camera* camera) {
     glm::ivec2 cameraChunkCoord = {
-        camera.getPosition().x/Chunk::Length,
-        camera.getPosition().z/Chunk::Width,
+        camera->getPosition().x/Chunk::Length,
+        camera->getPosition().z/Chunk::Width,
     };
 
     const int32_t viewDistance = 24;
@@ -69,10 +69,10 @@ void World::update(const yc::Camera& camera) {
 }
 
 void World::generateOrLoadChunkAt(const glm::ivec2& chunkCoord) {
-    auto chunk = persistence->getChunk(chunkCoord, shared_from_this());
+    auto chunk = persistence->getChunk(chunkCoord, this);
 
     if (chunk == nullptr) {
-        chunk = this->generator.generateChunk(shared_from_this(), chunkCoord);
+        chunk = this->generator.generateChunk(this, chunkCoord);
     }
     
     const std::array<glm::ivec2, 4> neighborChunks = {{
@@ -103,12 +103,16 @@ bool World::isChunkLoaded(const glm::ivec2& chunkCoord) {
     return iter != this->chunks.end();
 }
 
-void World::render() {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+void World::render(Camera* camera) {
+    // glEnable(GL_BLEND);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    yc::Resource::GameTexure.bind();
+    yc::Resource::ChunkShader.use();
+    yc::Resource::ChunkShader.setMat4("projection_view", camera->getProjectionViewMatrix());
+    
     for (const auto& [coord, chunk]: this->chunks) {
         glm::mat4 model =  glm::translate(glm::mat4(1.0f), glm::vec3(coord.x * Chunk::Length, 0, coord.y * Chunk::Width));
-        Resource::ChunkShader.setMat4("model", model);
+        yc::Resource::ChunkShader.setMat4("model", model);
         chunk->render();
     }
 }

@@ -62,7 +62,7 @@ void Persistence::loadRegion(const glm::ivec2& regionCoord) {
     this->regions[regionCoord] = region;
 }
 
-std::shared_ptr<yc::world::Chunk> Persistence::getChunk(const glm::ivec2& chunkCoord, const std::shared_ptr<yc::world::World>& world) {
+std::shared_ptr<yc::world::Chunk> Persistence::getChunk(const glm::ivec2& chunkCoord, yc::world::World* world) {
     const glm::ivec2 localChunkCoord = { chunkCoord.x & 31, chunkCoord.y & 31 };
     const glm::ivec2 regionCoord = { chunkCoord.x >> 5, chunkCoord.y >> 5 };
     const int16_t chunkId = localChunkCoord.x + localChunkCoord.y * 32;
@@ -90,7 +90,8 @@ std::shared_ptr<yc::world::Chunk> Persistence::getChunk(const glm::ivec2& chunkC
     return chunk;
 }
 
-void Persistence::saveChunk(const std::shared_ptr<yc::world::Chunk>& chunk) {
+void Persistence::saveChunk(std::shared_ptr<yc::world::Chunk> chunk) {
+    return;
     const glm::ivec2 chunkCoord = chunk->getCoord();
     const glm::ivec2 localChunkCoord = { chunkCoord.x & 31, chunkCoord.y & 31 };
     const glm::ivec2 regionCoord = { chunkCoord.x >> 5, chunkCoord.y >> 5 };

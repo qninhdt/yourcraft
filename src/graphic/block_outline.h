@@ -17,7 +17,7 @@ public:
 
     void init();
 
-    void render(const yc::Camera& camera, const glm::ivec3& coord);
+    void render(yc::Camera* camera, const glm::ivec3& coord);
 
 private:
 

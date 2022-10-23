@@ -22,37 +22,34 @@ public:
     ~Application();
 
     bool isStopped();
-    void stop();
-    void process();
-    uint32_t getWidth();
-    uint32_t getHeight();
-    std::string getTitle();
-    Camera* getCamera();
-    yc::graphic::Display* getDisplay();
-    void terminate();
-    GLFWwindow* window;
-    std::shared_ptr<yc::world::World> overworld;
 
+    void stop();
+
+    void process();
+
+    yc::graphic::Display* getDisplay();
+
+    Player* getPlayer();
+
+    void terminate();
 
 private:
+
+    friend void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+    friend void mouseCallback(GLFWwindow* window, double xpos, double ypos);
+    friend void sizeCallback(GLFWwindow* window, int width, int height);
+    friend void mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods);
 
     static float deltaTime;
 
     bool stopped;
-    uint32_t width;
-    uint32_t height;
-    std::string title;
 
-    glm::ivec3 selectingBlockCoord;
-    glm::ivec3 selectingFace;
-    bool selectingBlock;
+    graphic::Display display;
 
-    Camera camera;
-    yc::graphic::Display display;
-    yc::graphic::SkyBox skybox;
-    yc::graphic::BlockOutline blockOutline;
-    yc::graphic::CrossHair crosshair;
-    Persistence persistence;
+    GLFWwindow* window;
+    yc::world::World* world;
+    Player* player;
+    Persistence* persistence;
 };
 
 }

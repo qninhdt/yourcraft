@@ -33,7 +33,7 @@ void Chunk::prepareToBuildMesh() {
     this->needToBuildMesh = true;
 }
 
-void Chunk::setCoordinate(const std::shared_ptr<World>& world, const glm::ivec2& coord) {
+void Chunk::setCoordinate(World* world, const glm::ivec2& coord) {
     this->world = world;
     this->coord = coord;
 }
@@ -164,7 +164,6 @@ BlockData Chunk::getBlockDataAt(const glm::ivec3& coord) {
 }
 
 void Chunk::render() {
-    if (this->firstMeshBuild) return;
     this->mesh.bind();
     this->mesh.draw();
     this->mesh.unbind();

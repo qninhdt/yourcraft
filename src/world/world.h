@@ -5,11 +5,11 @@
 #include "persistence.h"
 #include "world/world_generator.h"
 #include "world/chunk.h"
-#include "camera.h"
+#include "player.h"
 
 namespace yc::world {
 
-class World: public std::enable_shared_from_this<World> {
+class World {
 
 public:
 
@@ -23,9 +23,9 @@ public:
 
     void init();
 
-    void update(const yc::Camera& camera);
+    void update(yc::Camera* camera);
 
-    void render();
+    void render(yc::Camera* camera);
 
     BlockData getBlockDataIfLoadedAt(const glm::ivec3& coord);
 
@@ -46,8 +46,6 @@ public:
     void saveChunks();
 
     int32_t getSeed() const;
-
-    std::shared_ptr<FastNoiseLite> getNoiseHandle() const;
 
 private:
 

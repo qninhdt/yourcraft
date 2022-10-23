@@ -47,8 +47,8 @@ public:
     }
 
     void render() {
-        Resource::CrossHairShader.use();
         Resource::CrossHairTexture.bind();
+        Resource::CrossHairShader.use();
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         this->mesh.bind();

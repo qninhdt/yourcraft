@@ -92,11 +92,11 @@ void SkyBox::init() {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 }
 
-void SkyBox::render(const yc::Camera& camera) {
-    glDepthFunc(GL_LEQUAL); 
+void SkyBox::render(yc::Camera* camera) {
+    glDepthFunc(GL_LEQUAL);
 
     yc::Resource::SkyBoxShader.use();
-    yc::Resource::SkyBoxShader.setMat4("projection_view",camera.getProjectionMatrix()*glm::mat4(glm::mat3(camera.getViewMatrix())));
+    yc::Resource::SkyBoxShader.setMat4("projection_view",camera->getProjectionMatrix()*glm::mat4(glm::mat3(camera->getViewMatrix())));
     yc::Resource::SkyBoxShader.setInt("skybox", 0);
 
     glBindVertexArray(this->vao);

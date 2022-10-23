@@ -11,7 +11,7 @@ public:
 
     SkyBox();
     void init();
-    void render(const yc::Camera& camera);
+    void render(yc::Camera* camera);
 
 private:
 

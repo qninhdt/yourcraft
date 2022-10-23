@@ -19,7 +19,7 @@ public:
 
     Chunk();
 
-    void setCoordinate(const std::shared_ptr<World>& world, const glm::ivec2& coord);
+    void setCoordinate(World* world, const glm::ivec2& coord);
 
     void buildMesh();
 
@@ -51,7 +51,7 @@ private:
     yc::gl::Mesh mesh;
 
     glm::ivec2 coord;
-    std::shared_ptr<World> world;
+    World* world;
     
 };
 

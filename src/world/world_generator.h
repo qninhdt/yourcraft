@@ -1,6 +1,6 @@
 #pragma once
 
-#include <memory.h>
+#include <memory>
 #include <glm/glm.hpp>
 #include <FastNoiseLite.h>
 #include "world/chunk.h"
@@ -11,7 +11,7 @@ class WorldGenerator {
 
 public:
 
-    std::shared_ptr<Chunk> generateChunk(std::shared_ptr<World> world,
+    std::shared_ptr<Chunk> generateChunk(World* world,
         const glm::ivec2& chunkCoord);
 
     WorldGenerator(int32_t seed);
@@ -19,7 +19,7 @@ public:
 private:
 
     int32_t seed;
-    FastNoiseLite noise1;
+    FastNoiseLite mountainNoise;
     FastNoiseLite noise2;
     FastNoiseLite noise3;
 

@@ -20,8 +20,8 @@ int main()
 {
     yc::Application app(1600, 800, "Yourcraft");
  
-    app.getCamera()->setOrientation(-89, 45);
-    app.getCamera()->setPosition({ 0, 70, 0 });
+    app.getPlayer()->getCamera()->setOrientation(-89, 45);
+    app.getPlayer()->getCamera()->setPosition({ 0, 70, 0 });
 
     while (!app.isStopped()) {
         app.process();

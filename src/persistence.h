@@ -27,13 +27,13 @@ public:
 
     void loadRegion(const glm::ivec2& regionCoord);
 
-    void saveChunk(const std::shared_ptr<yc::world::Chunk>& chunk);
+    void saveChunk(std::shared_ptr<yc::world::Chunk> chunk);
 
     void syncRegionFiles();
 
     std::string getRegionFileName(const glm::ivec2& regionCoord) const;
 
-    std::shared_ptr<yc::world::Chunk> getChunk(const glm::ivec2& chunkCoord, const std::shared_ptr<yc::world::World>& world);
+    std::shared_ptr<yc::world::Chunk> getChunk(const glm::ivec2& chunkCoord, yc::world::World* world);
 
 private:
 

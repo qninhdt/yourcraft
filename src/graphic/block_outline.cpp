@@ -52,9 +52,9 @@ void BlockOutline::init() {
     this->mesh.unbind();
 }
 
-void BlockOutline::render(const yc::Camera& camera, const glm::ivec3& coord) {
+void BlockOutline::render(yc::Camera* camera, const glm::ivec3& coord) {
     yc::Resource::BlockOutlineShader.use();
-    yc::Resource::BlockOutlineShader.setMat4("projection_view", camera.getProjectionViewMatrix());
+    yc::Resource::BlockOutlineShader.setMat4("projection_view", camera->getProjectionViewMatrix());
     yc::Resource::BlockOutlineShader.setMat4("model",
         glm::translate(glm::mat4(1.0f), glm::vec3(coord))
     );

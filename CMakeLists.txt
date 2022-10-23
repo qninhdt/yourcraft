@@ -20,6 +20,7 @@ add_executable(YourCraft
     src/world/world.cpp
     src/world/world_generator.cpp
     src/persistence.cpp
+    src/player.cpp
     deps/glad/src/glad.c
 )
 
