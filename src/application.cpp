@@ -85,7 +85,7 @@ void Application::process() {
     }
     
 
-    float cameraSpeed = 100.0f; // adjust accordingly
+    float cameraSpeed = 50.0f; // adjust accordingly
     glm::vec3 new_position = this->getCamera()->getPosition();
 
     if (glfwGetKey(this->window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) cameraSpeed *= 2;
@@ -117,7 +117,7 @@ void Application::process() {
         if (this->selectingBlock) {
             this->overworld->setBlockDataIfLoadedAt(
                 this->selectingBlockCoord + this->selectingFace,
-                { world::BlockType::STONE }
+                { world::BlockType::WATER }
             );
         }
     }

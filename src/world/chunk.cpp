@@ -91,7 +91,15 @@ void Chunk::buildMesh() {
                     blockToCheck = this->blocks[coordToCheck.x][coordToCheck.y][coordToCheck.z];
                 }
 
-                if (blockToCheck.getType() != BlockType::AIR) continue;
+                if (blockType == BlockType::WATER && blockToCheck.getType() == BlockType::WATER) {
+                    continue;
+                }
+                if (blockType == BlockType::GLASS && blockToCheck.getType() == BlockType::GLASS) {
+                    continue;
+                }
+                if (blockToCheck.getType() != BlockType::AIR
+                    && blockToCheck.getType() != BlockType::GLASS
+                    && blockToCheck.getType() != BlockType::WATER) continue;
             }
 
             const uint32_t id = chunkVerticesSize;

@@ -13,6 +13,8 @@ enum class BlockType {
     SAND,
     STONE,
     WOOD,
+    GLASS,
+    WATER,
     NONE,
 };
 

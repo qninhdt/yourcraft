@@ -118,6 +118,18 @@ void BlockVertex::setBlockType(yc::world::BlockType blockType, const glm::ivec3&
             } else {
                 setTexure(7, 0);
             }
+            break;
+        case yc::world::BlockType::GLASS:
+            setTexure(8, 0);
+            break;
+        case yc::world::BlockType::WATER:
+            if (faceDirection.y == 1) {
+                setTexure(0, 15);
+            } else if (faceDirection.y == -1) {
+                setTexure(1, 15);
+            } else {
+                setTexure(2, 15);
+            }
         default:
             break;
     }

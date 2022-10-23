@@ -21,7 +21,7 @@ void World::update(const yc::Camera& camera) {
         camera.getPosition().z/Chunk::Width,
     };
 
-    const int32_t viewDistance = 32;
+    const int32_t viewDistance = 24;
     std::vector<std::shared_ptr<Chunk>> shouldBeUnloadedChunks;
     for (const auto& [chunkCoord, chunk]: this->chunks) {
         if (Chunk::DistanceTo(chunkCoord, cameraChunkCoord) > viewDistance) {
@@ -104,6 +104,8 @@ bool World::isChunkLoaded(const glm::ivec2& chunkCoord) {
 }
 
 void World::render() {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     for (const auto& [coord, chunk]: this->chunks) {
         glm::mat4 model =  glm::translate(glm::mat4(1.0f), glm::vec3(coord.x * Chunk::Length, 0, coord.y * Chunk::Width));
         Resource::ChunkShader.setMat4("model", model);

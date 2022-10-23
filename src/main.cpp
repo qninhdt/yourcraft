@@ -19,7 +19,7 @@
 int main()
 {
     yc::Application app(1600, 800, "Yourcraft");
-
+ 
     app.getCamera()->setOrientation(-89, 45);
     app.getCamera()->setPosition({ 0, 70, 0 });
 

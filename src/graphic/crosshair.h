@@ -31,8 +31,6 @@ public:
 
     const int32_t Size = 20;
 
-    
-
     CrossHair() {}
 
     void init(int32_t screenWidth, int32_t screenHeight) {
