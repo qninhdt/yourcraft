@@ -27,7 +27,9 @@ public:
 
     void prepareToBuildMesh();
 
-    void render();
+    void renderOpaque();
+
+    void renderTransparent();
 
     static int32_t DistanceTo(const glm::ivec2& chunkCoord, const glm::ivec2& coord);
 
@@ -42,13 +44,14 @@ public:
     BlockData* getChunkData();
 
     void setBlockData(const glm::ivec3& coord, BlockData blockData);
-    bool needToBuildMesh;
-    bool firstMeshBuild;
 
 private:
 
     BlockData blocks[Length][Height][Width]; // 0.5Mb wtf?
-    yc::gl::Mesh mesh;
+    std::shared_ptr<yc::gl::Mesh> opaqueMesh;
+    std::shared_ptr<yc::gl::Mesh> transparentMesh; 
+
+    bool needToBuildMesh;
 
     glm::ivec2 coord;
     World* world;

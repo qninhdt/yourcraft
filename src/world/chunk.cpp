@@ -7,9 +7,6 @@
 
 namespace yc::world {
 
-uint32_t chunkVertices[300000];
-uint32_t chunkIndices[500000];
-
 const std::array<glm::ivec3, 6> directionsToCheck = {{
     { 0, 0, +1 }, // front
     { 0, 0, -1 }, // back
@@ -19,10 +16,10 @@ const std::array<glm::ivec3, 6> directionsToCheck = {{
     { 0, -1, 0 }, // bottom
 }};
 
-Chunk::Chunk() {
-    // set all blocks in chunk to air (default block type)
-    this->needToBuildMesh = true;
-    this->firstMeshBuild = true;
+Chunk::Chunk():
+    needToBuildMesh(false),
+    opaqueMesh(nullptr),
+    transparentMesh(nullptr) {
 }
 
 BlockData* Chunk::getChunkData() {
@@ -50,7 +47,15 @@ void Chunk::buildMeshIfNeeded() {
 
 // TODO: optimize this later
 void Chunk::buildMesh() {
-    size_t chunkVerticesSize = 0, chunkIndicesSize = 0;
+    size_t chunkOpaqueVerticesSize = 0;
+    size_t chunkOpaqueIndicesSize = 0;
+    size_t chunkTransparentVerticesSize = 0;
+    size_t chunkTransparentIndicesSize = 0;
+
+    static uint32_t chunkOpaqueVertices[300000];
+    static uint32_t chunkOpaqueIndices[500000];
+    static uint32_t chunkTransparentVertices[300000];
+    static uint32_t chunkTransparentIndices[500000];
 
     auto northChunk = this->world->getChunkIfLoadedAt({ this->coord.x, this->coord.y - 1 });
     auto southChunk = this->world->getChunkIfLoadedAt({ this->coord.x, this->coord.y + 1 });
@@ -60,8 +65,8 @@ void Chunk::buildMesh() {
     for (int32_t x=0; x<Chunk::Length; ++x) 
     for (int32_t y=0; y<Chunk::Height; ++y) 
     for (int32_t z=0; z<Chunk::Width; ++z) {
-        const BlockData& block = this->blocks[x][y][z];
-        const BlockType blockType = block.getType();
+        BlockData& block = this->blocks[x][y][z];
+        BlockType blockType = block.getType();
 
         if (blockType == BlockType::AIR) continue;
         
@@ -91,49 +96,72 @@ void Chunk::buildMesh() {
                     blockToCheck = this->blocks[coordToCheck.x][coordToCheck.y][coordToCheck.z];
                 }
 
-                if (blockType == BlockType::WATER && blockToCheck.getType() == BlockType::WATER) {
+                if (blockType == blockToCheck.getType() && blockToCheck.isTransparent()) {
                     continue;
                 }
-                if (blockType == BlockType::GLASS && blockToCheck.getType() == BlockType::GLASS) {
-                    continue;
-                }
-                if (blockToCheck.getType() != BlockType::AIR
-                    && blockToCheck.getType() != BlockType::GLASS
-                    && blockToCheck.getType() != BlockType::WATER) continue;
+
+                if (blockToCheck.isOpaque() && blockType!=BlockType::GLASS) continue;
             }
 
-            const uint32_t id = chunkVerticesSize;
+            const uint32_t opaqueId = chunkOpaqueVerticesSize;
+            const uint32_t transparentId = chunkTransparentVerticesSize;
             auto vertices = yc::graphic::BlockVertex::GetVerticesFromDirection(direction);                    
 
             for (auto& vertex: vertices) {
                 vertex.moveCoordinate(x, y, z);
                 vertex.setBlockType(blockType, direction);
 
-                chunkVertices[chunkVerticesSize++] = vertex.getData();
+                if (block.isOpaque()) {
+                    chunkOpaqueVertices[chunkOpaqueVerticesSize++] = vertex.getData();
+                } else {
+                    chunkTransparentVertices[chunkTransparentVerticesSize++] = vertex.getData();
+                }
             }
 
-            chunkIndices[chunkIndicesSize++] = id + 0;
-            chunkIndices[chunkIndicesSize++] = id + 1;
-            chunkIndices[chunkIndicesSize++] = id + 2;
-            chunkIndices[chunkIndicesSize++] = id + 0;
-            chunkIndices[chunkIndicesSize++] = id + 2;
-            chunkIndices[chunkIndicesSize++] = id + 3;
+            if (block.isOpaque()) {
+                chunkOpaqueIndices[chunkOpaqueIndicesSize++] = opaqueId + 0;
+                chunkOpaqueIndices[chunkOpaqueIndicesSize++] = opaqueId + 1;
+                chunkOpaqueIndices[chunkOpaqueIndicesSize++] = opaqueId + 2;
+                chunkOpaqueIndices[chunkOpaqueIndicesSize++] = opaqueId + 0;
+                chunkOpaqueIndices[chunkOpaqueIndicesSize++] = opaqueId + 2;
+                chunkOpaqueIndices[chunkOpaqueIndicesSize++] = opaqueId + 3;
+            } else {
+                chunkTransparentIndices[chunkTransparentIndicesSize++] = transparentId + 0;
+                chunkTransparentIndices[chunkTransparentIndicesSize++] = transparentId + 1;
+                chunkTransparentIndices[chunkTransparentIndicesSize++] = transparentId + 2;
+                chunkTransparentIndices[chunkTransparentIndicesSize++] = transparentId + 0;
+                chunkTransparentIndices[chunkTransparentIndicesSize++] = transparentId + 2;
+                chunkTransparentIndices[chunkTransparentIndicesSize++] = transparentId + 3;
+            }
         }
     }
 
-    if (this->firstMeshBuild) {
-        this->mesh.init();
-        this->mesh.bind();
-        this->mesh.addIndices(&chunkIndices[0], chunkIndicesSize);
-        this->mesh.addStaticBuffer(1, &chunkVertices[0], chunkVerticesSize);
-        this->mesh.unbind();
-        
-        this->firstMeshBuild = false;
-    }  else {
-        this->mesh.bind();
-        this->mesh.updateIndices(&chunkIndices[0], chunkIndicesSize);
-        this->mesh.updateStaticBuffer(0, &chunkVertices[0], chunkVerticesSize);
-        this->mesh.unbind();
+    if (chunkOpaqueIndices != 0) {
+        if (opaqueMesh == nullptr) {
+            opaqueMesh = std::make_shared<yc::gl::Mesh>();
+            opaqueMesh->init();
+            opaqueMesh->bind();
+            opaqueMesh->addIndices(&chunkOpaqueIndices[0], chunkOpaqueIndicesSize);
+            opaqueMesh->addStaticBuffer(1, &chunkOpaqueVertices[0], chunkOpaqueVerticesSize);
+        }  else {
+            opaqueMesh->bind();
+            opaqueMesh->updateIndices(&chunkOpaqueIndices[0], chunkOpaqueIndicesSize);
+            opaqueMesh->updateStaticBuffer(0, &chunkOpaqueVertices[0], chunkOpaqueVerticesSize);
+        }
+    }
+
+    if (chunkTransparentIndices != 0) {
+        if (transparentMesh == nullptr) {
+            transparentMesh = std::make_shared<yc::gl::Mesh>();
+            transparentMesh->init();
+            transparentMesh->bind();
+            transparentMesh->addIndices(&chunkOpaqueIndices[0], chunkOpaqueIndicesSize);
+            transparentMesh->addStaticBuffer(1, &chunkOpaqueVertices[0], chunkOpaqueVerticesSize);
+        }  else {
+            transparentMesh->bind();
+            transparentMesh->updateIndices(&chunkTransparentIndices[0], chunkTransparentIndicesSize);
+            transparentMesh->updateStaticBuffer(0, &chunkTransparentVertices[0], chunkTransparentVerticesSize);
+        }
     }
 
     this->needToBuildMesh = false;
@@ -163,10 +191,16 @@ BlockData Chunk::getBlockDataAt(const glm::ivec3& coord) {
     return this->blocks[coord.x][coord.y][coord.z];
 }
 
-void Chunk::render() {
-    this->mesh.bind();
-    this->mesh.draw();
-    this->mesh.unbind();
+void Chunk::renderOpaque() {
+    if (opaqueMesh == nullptr) return;
+    opaqueMesh->bind();
+    opaqueMesh->draw();
+}
+
+void Chunk::renderTransparent() {
+    if (transparentMesh == nullptr) return;
+    transparentMesh->bind();
+    transparentMesh->draw();
 }
 
 void Chunk::setBlockData(const glm::ivec3& coord, BlockData blockData) {

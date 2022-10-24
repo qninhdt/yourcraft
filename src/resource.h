@@ -9,7 +9,8 @@ class Resource {
 
 public:
 
-    static yc::gl::Shader ChunkShader;
+    static yc::gl::Shader OpaqueShader;
+    static yc::gl::Shader TransparentShader;
     static yc::gl::Shader SkyBoxShader;
     static yc::gl::Shader BlockOutlineShader;
     static yc::gl::Shader CrossHairShader;

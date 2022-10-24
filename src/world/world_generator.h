@@ -14,6 +14,8 @@ public:
     std::shared_ptr<Chunk> generateChunk(World* world,
         const glm::ivec2& chunkCoord);
 
+    BlockData getBlockData(int32_t height);
+
     WorldGenerator(int32_t seed);
 
 private:

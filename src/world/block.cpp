@@ -42,4 +42,15 @@ void BlockData::setFaceDirection(BlockFaceDirection blockFaceDirection) {
     this->data += newFaceDirectionId << 5;
 }
 
+bool BlockData::isOpaque() {
+    return !BlockData::isTransparent();
+}
+
+bool BlockData::isTransparent() {
+    BlockType blockType = getType();
+    return blockType == BlockType::AIR
+        || blockType == BlockType::GLASS
+        || blockType == BlockType::WATER;
+}
+
 }

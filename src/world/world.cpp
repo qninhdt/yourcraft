@@ -35,12 +35,11 @@ void World::update(yc::Camera* camera) {
     persistence->syncRegionFiles();
 
     std::atomic_int chunkCount = 0;
-    const int32_t maxChunksLoadPerFrame = 4;
+    const int32_t maxChunksLoadPerFrame = 2;
 
     int32_t x=0, z=0, dx=0, dz=-1;
     int32_t size = viewDistance*2+1;
     int32_t numChunksToCheck = size*size;
-    // double begin = glfwGetTime();
 
     while (numChunksToCheck-- && chunkCount < maxChunksLoadPerFrame) {
         glm::ivec2 chunkCoordToCheck = glm::ivec2(x, z) + cameraChunkCoord;
@@ -104,17 +103,39 @@ bool World::isChunkLoaded(const glm::ivec2& chunkCoord) {
 }
 
 void World::render(Camera* camera) {
-    // glEnable(GL_BLEND);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     yc::Resource::GameTexure.bind();
-    yc::Resource::ChunkShader.use();
-    yc::Resource::ChunkShader.setMat4("projection_view", camera->getProjectionViewMatrix());
     
+    static glm::mat4 modelMats[5000];
+    uint32_t idx;
+
+    // pre-calc model matrix
+    idx = 0;
     for (const auto& [coord, chunk]: this->chunks) {
-        glm::mat4 model =  glm::translate(glm::mat4(1.0f), glm::vec3(coord.x * Chunk::Length, 0, coord.y * Chunk::Width));
-        yc::Resource::ChunkShader.setMat4("model", model);
-        chunk->render();
+        modelMats[idx++] =  glm::translate(glm::mat4(1.0f), glm::vec3(coord.x * Chunk::Length, 0, coord.y * Chunk::Width));
     }
+
+    yc::Resource::OpaqueShader.use();
+    yc::Resource::OpaqueShader.setMat4("projection_view", camera->getProjectionViewMatrix());
+
+    idx = 0;
+    for (const auto& [coord, chunk]: this->chunks) {
+        yc::Resource::OpaqueShader.setMat4("model", modelMats[idx++]);
+        chunk->renderOpaque();
+    }
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+
+    yc::Resource::TransparentShader.use();
+    yc::Resource::TransparentShader.setMat4("projection_view", camera->getProjectionViewMatrix());
+
+    idx = 0;
+    for (const auto& [coord, chunk]: this->chunks) {
+        yc::Resource::TransparentShader.setMat4("model", modelMats[idx++]);
+        chunk->renderTransparent();
+    }
+
+    glDisable(GL_BLEND);
 }
 
 void World::saveChunks() {
@@ -203,8 +224,25 @@ bool World::setBlockDataIfLoadedAt(const glm::ivec3& coord, const BlockData& blo
             coord.y,
             util::PositiveMod(coord.z, Chunk::Width)
         }, blockData);
-
         chunk->prepareToBuildMesh();
+
+        glm::ivec3 localCoord = { coord.x & 15, coord.y, coord.z & 15 };
+
+        if (localCoord.x == 0) {
+            auto westChunk = getChunkIfLoadedAt({ chunkCoord.x-1, chunkCoord.y });
+            if (westChunk) westChunk->prepareToBuildMesh();
+        } else if (localCoord.x == 15) {
+            auto eastChunk = getChunkIfLoadedAt({ chunkCoord.x+1, chunkCoord.y });
+            if (eastChunk) eastChunk->prepareToBuildMesh();
+        }
+
+        if (localCoord.z == 0) {
+            auto northChunk = getChunkIfLoadedAt({ chunkCoord.x, chunkCoord.y-1 });
+            if (northChunk) northChunk->prepareToBuildMesh();
+        } else if (localCoord.z == 15) {
+            auto southChunk = getChunkIfLoadedAt({ chunkCoord.x, chunkCoord.y+1 });
+            if (southChunk) southChunk->prepareToBuildMesh();
+        }
 
         return true;
     } else {    

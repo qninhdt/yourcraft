@@ -41,6 +41,9 @@ public:
     void setType(BlockType blockType);
     void setFaceDirection(BlockFaceDirection faceDirection);
 
+    bool isOpaque();
+    bool isTransparent();
+
 private:
     // |  bit  |    name    |
     // |  0-4  | block-type |

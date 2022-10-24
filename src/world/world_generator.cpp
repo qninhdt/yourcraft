@@ -13,6 +13,10 @@ WorldGenerator::WorldGenerator(int32_t seed):
     // this->mountainNoise.SetFractalWeightedStrength(1);
 }
 
+BlockData WorldGenerator::getBlockData(int32_t height) {
+    
+}
+
 std::shared_ptr<Chunk> WorldGenerator::generateChunk(World* world,
     const glm::ivec2& chunkCoord) {
         
@@ -24,6 +28,7 @@ std::shared_ptr<Chunk> WorldGenerator::generateChunk(World* world,
     static BlockData grassBlock { BlockType::GRASS };
     static BlockData stoneBlock { BlockType::STONE };
     static BlockData waterBlock { BlockType::WATER };
+    static BlockData sandBlock { BlockType::SAND };
 
     glm::vec3 worldCoord = chunk->getWorldCoord();
     
@@ -46,11 +51,15 @@ std::shared_ptr<Chunk> WorldGenerator::generateChunk(World* world,
         chunk->setBlockData(coord, stoneBlock);
         coord.y++;
 
+        for (;coord.y<=std::min(45, height-1); ++coord.y) {
+            chunk->setBlockData(coord, sandBlock);
+        }
+
         for (;coord.y<=std::min(100, height-1); ++coord.y) {
             chunk->setBlockData(coord, dirtBlock);
         }
 
-        if (height<100) {
+        if (height<101 && height>45) {
             chunk->setBlockData(coord, grassBlock);
             coord.y++;
         }
@@ -59,9 +68,7 @@ std::shared_ptr<Chunk> WorldGenerator::generateChunk(World* world,
             chunk->setBlockData(coord, stoneBlock);
         }
 
-        
-
-        for (int32_t y=height; y<=40; ++y) {
+        for (int32_t y=height; y<=43; ++y) {
             chunk->setBlockData(coord, waterBlock);
             coord.y++;
         }

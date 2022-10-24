@@ -122,6 +122,9 @@ void BlockVertex::setBlockType(yc::world::BlockType blockType, const glm::ivec3&
         case yc::world::BlockType::GLASS:
             setTexure(8, 0);
             break;
+        case yc::world::BlockType::SAND:
+            setTexure(9, 0);
+            break;
         case yc::world::BlockType::WATER:
             if (faceDirection.y == 1) {
                 setTexure(0, 15);

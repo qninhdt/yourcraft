@@ -45,7 +45,7 @@ void Player::update() {
         if (blockType == yc::world::BlockType::NONE) {
             this->selectingBlock = false;
             break;
-        } else if (blockType != yc::world::BlockType::AIR) {
+        } else if (blockType != yc::world::BlockType::AIR && blockType != yc::world::BlockType::WATER) {
             this->selectingBlock = true;
             this->selectingBlockCoord = { x, y, z };
             break;
