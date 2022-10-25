@@ -25,7 +25,9 @@ public:
 
     void update(yc::Camera* camera);
 
-    void render(yc::Camera* camera);
+    void renderOpaque(yc::Camera* camera);
+
+    void renderTransparent(yc::Camera* camera);
 
     BlockData getBlockDataIfLoadedAt(const glm::ivec3& coord);
 

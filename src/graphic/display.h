@@ -1,10 +1,12 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include "gl/framebuffer.h"
 #include "graphic/crosshair.h"
 #include "graphic/skybox.h"
 #include "graphic/block_outline.h"
 #include "player.h"
+#include "world/world.h"
 
 namespace yc::graphic {
 
@@ -17,7 +19,7 @@ public:
 
     void prepareFrame();
 
-    void drawFrame(yc::Player* player);
+    void drawFrame(yc::Player* player, yc::world::World* world);
 
     void nextFrame();
 
@@ -31,6 +33,15 @@ private:
 
     int32_t width;
     int32_t height;
+
+    gl::FrameBuffer frame;
+
+    unsigned int opaqueFBO, transparentFBO;
+    unsigned int opaqueTexture;
+    unsigned int depthTexture;
+    unsigned int accumTexture;
+    unsigned int revealTexture;
+    unsigned int quadVAO, quadVBO;
 
     SkyBox skybox;
     BlockOutline blockOutline;

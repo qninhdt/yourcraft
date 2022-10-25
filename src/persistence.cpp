@@ -6,7 +6,7 @@
 
 namespace yc {
 
-const std::string Persistence::WorldFolder = "E:/github/yourcraft/save/"; 
+const std::string Persistence::WorldFolder = "./save/"; 
 
 const size_t ChunkSize = yc::world::Chunk::Volume * sizeof(yc::world::BlockData);
 const size_t RegionHeaderSize = sizeof(int16_t) + sizeof(int16_t) * 32 * 32;
@@ -91,7 +91,6 @@ std::shared_ptr<yc::world::Chunk> Persistence::getChunk(const glm::ivec2& chunkC
 }
 
 void Persistence::saveChunk(std::shared_ptr<yc::world::Chunk> chunk) {
-    return;
     const glm::ivec2 chunkCoord = chunk->getCoord();
     const glm::ivec2 localChunkCoord = { chunkCoord.x & 31, chunkCoord.y & 31 };
     const glm::ivec2 regionCoord = { chunkCoord.x >> 5, chunkCoord.y >> 5 };

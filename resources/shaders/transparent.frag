@@ -1,35 +1,35 @@
 #version 440 core
 
 uniform sampler2D game_texture;
-
-out vec4 FragColor;
+uniform float zFar = 5000.0f;
+uniform float zNear = 0.1f;
 
 flat in uvec2 tex_coord;
 in vec2 vert_pos;
 
-// uniform float zFar = 500.0f;
-// uniform float zNear = 0.1f;
-
-// layout(location = 0) out vec4 accumTexture;
-// layout(location = 1) out vec4 revealageTexture;
-
-// float d(float z) {
-//     return ((zNear * zFar) / z - zFar) / (zNear - zFar);
-// }
-
-// float weight(float z, float a) {
-//     float b = 1 - d(z);
-//     return a * max(0.01f, b * b * b * 0.003);
-// }
+layout (location = 0) out vec4 accum;
+layout (location = 1) out float reveal;
 
 const float sprite_size = 1.0f / 16;
+
+float d(float z) {
+    return ((zNear * zFar) / z - zFar) / (zNear - zFar);
+}
+
+float weight(float z, float a) {
+    float b = 1 - d(z);
+    return a * max(0.01f, b * b * b * 0.003);
+}
 
 void main() {  
     vec2 coord = vec2(sprite_size * tex_coord.x, sprite_size * tex_coord.y);
     coord.x += (vert_pos.x) * sprite_size;
     coord.y += (vert_pos.y) * sprite_size;
+
     vec4 color = texture(game_texture, coord);
-    FragColor = color;
-    // accumTexture = color * weight(gl_FragCoord.z, color.w);
-    // revealageTexture = vec4(color.w);
+    // float weight = clamp(pow(min(1.0, color.a * 10.0) + 0.01, 3.0) * 1e8 * pow(1.0 - gl_FragCoord.z * 0.9, 3.0), 1e-2, 3e3);
+    // accum = vec4(color.rgb * color.a, color.a) * weight;
+    float w = weight(gl_FragCoord.z, color.w);
+    accum = vec4(color.xyz, color.w) * w;
+    reveal = color.a;
 }

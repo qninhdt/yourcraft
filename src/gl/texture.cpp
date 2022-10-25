@@ -8,8 +8,8 @@ yc::gl::Texture::Texture() {
 }
 
 void yc::gl::Texture::loadFromFile(std::string path) {
-    glGenTextures(1, &this->id);
-    glBindTexture(GL_TEXTURE_2D, this->id);
+    glGenTextures(1, &id);
+    glBindTexture(GL_TEXTURE_2D, id);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -31,30 +31,37 @@ void yc::gl::Texture::loadFromFile(std::string path) {
 
     std::cout << "Loaded texture " << path << " (" << this->width << "x" << this->height << ")\n";
 
-    // unsigned bytePerPixel = nrChannels;
-    // unsigned char* pixelOffset = data + (0+ width * 255) * bytePerPixel;
-    // unsigned char r = pixelOffset[0];
-    // unsigned char g = pixelOffset[1];
-    // unsigned char b = pixelOffset[2];
-    // unsigned char a = nrChannels >= 4 ? pixelOffset[3] : 0xff;
-
-    // std::cout << ((int)r) << ' ' << ((int)g) << ' ' << ((int)b) << '\n';
-
     stbi_image_free(data);
 }
 
 void yc::gl::Texture::bind() {
-    glBindTexture(GL_TEXTURE_2D, this->id);
+    glBindTexture(GL_TEXTURE_2D, id);
+}
+
+void yc::gl::Texture::bind(uint32_t slot) {
+    glActiveTexture(GL_TEXTURE0 + slot);
+    bind();
+}
+
+void yc::gl::Texture::allocate(int32_t width, int32_t height) {
+    bind();
+    glTexImage2D(
+        GL_TEXTURE_2D, 0, 
+        nrChannels == 4 ? GL_RGBA : GL_RGB, 
+        width, height, 0, 
+        nrChannels == 4 ? GL_RGBA : GL_RGB, 
+        GL_SHORT, nullptr
+    );
 }
 
 int yc::gl::Texture::getWidth() {
-    return this->width;
+    return width;
 }
 
 int yc::gl::Texture::getHeight() {
-    return this->height;
+    return height;
 }
 
 GLuint yc::gl::Texture::getId() {
-    return this->id;
+    return id;
 }

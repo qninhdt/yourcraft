@@ -14,6 +14,8 @@ public:
     int getHeight();
     GLuint getId();
     void bind();
+    void bind(uint32_t slot);
+    void allocate(int32_t width, int32_t height);
 
 private:
     GLuint id;

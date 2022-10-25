@@ -13,5 +13,5 @@ void main() {
     vec2 coord = vec2(sprite_size * tex_coord.x, sprite_size * tex_coord.y);
     coord.x += (vert_pos.x) * sprite_size;
     coord.y += (vert_pos.y) * sprite_size;
-    FragColor = texture(game_texture, coord)*vec4(0.9,0.9,0.9,1);
+    FragColor = texture(game_texture, coord);
 }

@@ -15,6 +15,7 @@
 #include "util/math.h"
 #include "graphic/skybox.h"
 #include "persistence.h"
+#include "gl/framebuffer.h"
 
 int main()
 {

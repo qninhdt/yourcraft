@@ -14,6 +14,7 @@ add_executable(YourCraft
     src/gl/shader.cpp
     src/gl/texture.cpp
     src/gl/shader.cpp
+    src/gl/framebuffer.cpp
     src/graphic/block_outline.cpp
     src/world/chunk.cpp
     src/world/block.cpp

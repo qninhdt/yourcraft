@@ -102,40 +102,30 @@ bool World::isChunkLoaded(const glm::ivec2& chunkCoord) {
     return iter != this->chunks.end();
 }
 
-void World::render(Camera* camera) {
+void World::renderOpaque(Camera* camera) {
     yc::Resource::GameTexure.bind();
     
-    static glm::mat4 modelMats[5000];
-    uint32_t idx;
-
-    // pre-calc model matrix
-    idx = 0;
-    for (const auto& [coord, chunk]: this->chunks) {
-        modelMats[idx++] =  glm::translate(glm::mat4(1.0f), glm::vec3(coord.x * Chunk::Length, 0, coord.y * Chunk::Width));
-    }
-
     yc::Resource::OpaqueShader.use();
     yc::Resource::OpaqueShader.setMat4("projection_view", camera->getProjectionViewMatrix());
 
-    idx = 0;
     for (const auto& [coord, chunk]: this->chunks) {
-        yc::Resource::OpaqueShader.setMat4("model", modelMats[idx++]);
+        auto model = glm::translate(glm::mat4(1.0f), glm::vec3(coord.x * Chunk::Length, 0, coord.y * Chunk::Width));
+        yc::Resource::OpaqueShader.setMat4("model", model);
         chunk->renderOpaque();
     }
+}
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+void World::renderTransparent(Camera* camera) {
+    yc::Resource::GameTexure.bind();
 
     yc::Resource::TransparentShader.use();
     yc::Resource::TransparentShader.setMat4("projection_view", camera->getProjectionViewMatrix());
 
-    idx = 0;
     for (const auto& [coord, chunk]: this->chunks) {
-        yc::Resource::TransparentShader.setMat4("model", modelMats[idx++]);
+        auto model = glm::translate(glm::mat4(1.0f), glm::vec3(coord.x * Chunk::Length, 0, coord.y * Chunk::Width));
+        yc::Resource::TransparentShader.setMat4("model", model);
         chunk->renderTransparent();
     }
-
-    glDisable(GL_BLEND);
 }
 
 void World::saveChunks() {

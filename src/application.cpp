@@ -20,8 +20,8 @@ Application::Application(int32_t width, int32_t height, const std::string& title
 
     // init GLFW
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // init stb_image
@@ -112,10 +112,7 @@ void Application::process() {
     player->update();
     world->update(player->getCamera());
 
-    display.prepareFrame();
-
-    world->render(player->getCamera());
-    display.drawFrame(player);
+    display.drawFrame(player, world);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

@@ -68,12 +68,12 @@ void SkyBox::init() {
 
     int32_t width, height, nrChannels;
     const std::string faces[] = {
-        "E:/github/yourcraft/resources/skybox/right.jpg",
-        "E:/github/yourcraft/resources/skybox/left.jpg",
-        "E:/github/yourcraft/resources/skybox/top.jpg",
-        "E:/github/yourcraft/resources/skybox/bottom.jpg",
-        "E:/github/yourcraft/resources/skybox/front.jpg",
-        "E:/github/yourcraft/resources/skybox/back.jpg"
+        "./resources/skybox/right.jpg",
+        "./resources/skybox/left.jpg",
+        "./resources/skybox/top.jpg",
+        "./resources/skybox/bottom.jpg",
+        "./resources/skybox/front.jpg",
+        "./resources/skybox/back.jpg"
     };
 
     stbi_set_flip_vertically_on_load(false);
@@ -103,7 +103,6 @@ void SkyBox::render(yc::Camera* camera) {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, this->texture);
     glDrawArrays(GL_TRIANGLES, 0, 36);
-    glDepthFunc(GL_LESS);
 }
 
 }
