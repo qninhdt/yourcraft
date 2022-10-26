@@ -27,6 +27,8 @@ public:
 
     int32_t getHeight();
 
+    void toggleLineMode();
+
 private:
 
     glm::vec3 clearColor = { 0.2f, 0.3f, 0.3f };
@@ -35,6 +37,8 @@ private:
     int32_t height;
 
     gl::FrameBuffer frame;
+
+    bool lineMode;
 
     unsigned int opaqueFBO, transparentFBO;
     unsigned int opaqueTexture;

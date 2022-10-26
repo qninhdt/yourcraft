@@ -11,6 +11,7 @@ class BlockOutline {
 public:
 
     static const float Vertices[];
+    static const float Uv[];
     static const uint32_t Indices[];
 
     BlockOutline();

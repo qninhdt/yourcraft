@@ -17,7 +17,8 @@ float quadVertices[] = {
 Display::Display(int32_t width, int32_t height):
     width(width),
     height(height),
-    frame(width, height)
+    frame(width, height),
+    lineMode(false)
 {}
 
 void Display::init() {
@@ -94,6 +95,10 @@ void Display::drawFrame(yc::Player* player, yc::world::World* world) {
     glm::vec4 zeroFillerVec(0.0f);
 	glm::vec4 oneFillerVec(1.0f);
 
+    if (lineMode) {
+        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    }
+
     // render into frame
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
@@ -151,7 +156,11 @@ void Display::drawFrame(yc::Player* player, yc::world::World* world) {
 	glDisable(GL_BLEND);
 
 	// bind backbuffer
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    if (lineMode) {
+        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -177,6 +186,10 @@ int32_t Display::getHeight() {
 
 int32_t Display::getWidth() {
     return width;
+}
+
+void Display::toggleLineMode() {
+    lineMode = !lineMode;
 }
 
 }

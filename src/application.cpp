@@ -133,16 +133,8 @@ Player* Application::getPlayer() {
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     Application* app = (Application*) glfwGetWindowUserPointer(window);
     
-    static bool lineMode = false;
-
     if (glfwGetKey(app->window, GLFW_KEY_F3) == GLFW_PRESS) {
-        lineMode = !lineMode;
-
-        if (lineMode) {
-            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-        } else {
-            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-        }
+        app->display.toggleLineMode();
     }
 
     if (glfwGetKey(app->window, GLFW_KEY_F1) == GLFW_PRESS) {
