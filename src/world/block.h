@@ -10,6 +10,8 @@ enum class BlockType {
     AIR = 0,
     DIRT,
     GRASS,
+    SNOW,
+    LEAF,
     SAND,
     STONE,
     WOOD,

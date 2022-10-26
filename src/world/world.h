@@ -47,6 +47,8 @@ public:
 
     void saveChunks();
 
+    void spawnTreeAt(const glm::ivec3& coord);
+
     int32_t getSeed() const;
 
 private:

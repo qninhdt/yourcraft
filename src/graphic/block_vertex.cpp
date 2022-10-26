@@ -119,6 +119,19 @@ void BlockVertex::setBlockType(yc::world::BlockType blockType, const glm::ivec3&
                 setTexure(7, 0);
             }
             break;
+        case yc::world::BlockType::LEAF:
+            setTexure(13, 0);
+            break;
+        case yc::world::BlockType::WOOD:
+            if (faceDirection.y == 1 || faceDirection.y == -1) {
+                setTexure(12, 0);
+            } else {
+                setTexure(11, 0);
+            }
+            break;
+        case yc::world::BlockType::SNOW:
+            setTexure(10, 0);
+            break;
         case yc::world::BlockType::GLASS:
             setTexure(8, 0);
             break;

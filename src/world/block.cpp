@@ -50,6 +50,7 @@ bool BlockData::isTransparent() {
     BlockType blockType = getType();
     return blockType == BlockType::AIR
         || blockType == BlockType::GLASS
+        || blockType == BlockType::LEAF
         || blockType == BlockType::WATER;
 }
 

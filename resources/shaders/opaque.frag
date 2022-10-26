@@ -14,4 +14,8 @@ void main() {
     coord.x += (vert_pos.x) * sprite_size;
     coord.y += (vert_pos.y) * sprite_size;
     FragColor = texture(game_texture, coord);
+
+    if (FragColor.w == 0) {
+        discard;
+    }
 }

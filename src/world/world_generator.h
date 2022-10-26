@@ -14,7 +14,11 @@ public:
     std::shared_ptr<Chunk> generateChunk(World* world,
         const glm::ivec2& chunkCoord);
 
-    BlockData getBlockData(int32_t height);
+    BlockData getBlockData(int32_t height, int32_t maxHeight, float noise);
+
+    void generateTreeAt(World* world, const glm::ivec3& coord, float noise);
+
+    void generateTreeAt(std::shared_ptr<Chunk> chunk, const glm::ivec3& coord, float noise);
 
     WorldGenerator(int32_t seed);
 

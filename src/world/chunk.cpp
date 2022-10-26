@@ -96,11 +96,11 @@ void Chunk::buildMesh() {
                     blockToCheck = this->blocks[coordToCheck.x][coordToCheck.y][coordToCheck.z];
                 }
 
-                if (blockType == blockToCheck.getType() && blockToCheck.isTransparent()) {
+                if (blockType == blockToCheck.getType() && blockToCheck.isTransparent() && blockType != BlockType::LEAF) {
                     continue;
                 }
 
-                if (blockToCheck.isOpaque() && blockType!=BlockType::GLASS) continue;
+                if (blockToCheck.isOpaque() && blockType!=BlockType::GLASS && blockType!=BlockType::GLASS) continue;
             }
 
             const uint32_t opaqueId = chunkOpaqueVerticesSize;

@@ -141,8 +141,6 @@ void Display::drawFrame(yc::Player* player, yc::world::World* world) {
 	glBindVertexArray(quadVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-    crosshair.render();
-
 	// draw to backbuffer (final pass)
 	// -----
 
@@ -164,6 +162,8 @@ void Display::drawFrame(yc::Player* player, yc::world::World* world) {
 	glBindTexture(GL_TEXTURE_2D, opaqueTexture);
 	glBindVertexArray(quadVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    crosshair.render();
 }
 
 void Display::nextFrame() {

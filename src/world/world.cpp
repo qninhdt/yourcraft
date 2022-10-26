@@ -240,6 +240,10 @@ bool World::setBlockDataIfLoadedAt(const glm::ivec3& coord, const BlockData& blo
     }
 }
 
+void World::spawnTreeAt(const glm::ivec3& coord) {
+    generator.generateTreeAt(this, coord, 0.5f);
+}
+
 size_t World::HashChunkCoord::operator() (const glm::ivec2& coord) const noexcept {
     auto hashX = std::hash<int32_t>{}(coord.x);
     auto hashY = std::hash<int32_t>{}(coord.y);
