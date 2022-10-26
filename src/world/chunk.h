@@ -31,6 +31,8 @@ public:
 
     void renderTransparent();
 
+    void renderFlora();
+
     static int32_t DistanceTo(const glm::ivec2& chunkCoord, const glm::ivec2& coord);
 
     BlockData getBlockDataAt(const glm::ivec3& coord);
@@ -50,6 +52,7 @@ private:
     BlockData blocks[Length][Height][Width]; // 0.5Mb wtf?
     std::shared_ptr<yc::gl::Mesh> opaqueMesh;
     std::shared_ptr<yc::gl::Mesh> transparentMesh; 
+    std::shared_ptr<yc::gl::Mesh> floraMesh;
 
     bool needToBuildMesh;
 

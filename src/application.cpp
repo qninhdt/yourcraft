@@ -177,11 +177,11 @@ void mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods) {
 
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
         if (app->player->isSelectingBlock()) {
-            // app->world->setBlockDataIfLoadedAt(
-            //     app->player->getSelectingBlock() + app->player->getSelectingFace(),
-            //     { world::BlockType::WOOD }
-            // );
-            app->world->spawnTreeAt(app->player->getSelectingBlock() + app->player->getSelectingFace());
+            app->world->setBlockDataIfLoadedAt(
+                app->player->getSelectingBlock() + app->player->getSelectingFace(),
+                { world::BlockType::BLUE_FLOWER }
+            );
+            // app->world->spawnTreeAt(app->player->getSelectingBlock() + app->player->getSelectingFace());
         }
     }
 

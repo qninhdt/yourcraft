@@ -29,6 +29,8 @@ public:
 
     void renderTransparent(yc::Camera* camera);
 
+    void renderFlora(yc::Camera* camera);
+
     BlockData getBlockDataIfLoadedAt(const glm::ivec3& coord);
 
     bool setBlockDataIfLoadedAt(const glm::ivec3& coord, const BlockData& blockData);

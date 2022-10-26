@@ -128,6 +128,19 @@ void World::renderTransparent(Camera* camera) {
     }
 }
 
+void World::renderFlora(yc::Camera* camera) {
+    yc::Resource::GameTexure.bind();
+
+    yc::Resource::FloraShader.use();
+    yc::Resource::FloraShader.setMat4("projection_view", camera->getProjectionViewMatrix());
+
+    for (const auto& [coord, chunk]: this->chunks) {
+        auto model = glm::translate(glm::mat4(1.0f), glm::vec3(coord.x * Chunk::Length, 0, coord.y * Chunk::Width));
+        yc::Resource::FloraShader.setMat4("model", model);
+        chunk->renderFlora();
+    }
+}   
+
 void World::saveChunks() {
     std::cout << "Saving world . . .\n";
     for (auto& [coord, chunk]: this->chunks) {
@@ -214,6 +227,7 @@ bool World::setBlockDataIfLoadedAt(const glm::ivec3& coord, const BlockData& blo
             coord.y,
             util::PositiveMod(coord.z, Chunk::Width)
         }, blockData);
+
         chunk->prepareToBuildMesh();
 
         glm::ivec3 localCoord = { coord.x & 15, coord.y, coord.z & 15 };

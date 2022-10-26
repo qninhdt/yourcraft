@@ -94,7 +94,7 @@ uint32_t BlockVertex::getData() const {
 
 void BlockVertex::setBlockType(yc::world::BlockType blockType, const glm::ivec3& faceDirection) {
     switch (blockType) {
-        case yc::world::BlockType::GRASS:
+        case yc::world::BlockType::GRASS_BLOCK:
             if (faceDirection.y == 1) {
                 setTexure(0, 0);
             } else if (faceDirection.y == -1) {

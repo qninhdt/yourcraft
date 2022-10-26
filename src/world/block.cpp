@@ -43,7 +43,7 @@ void BlockData::setFaceDirection(BlockFaceDirection blockFaceDirection) {
 }
 
 bool BlockData::isOpaque() {
-    return !BlockData::isTransparent();
+    return !BlockData::isTransparent() && !isFlora();
 }
 
 bool BlockData::isTransparent() {
@@ -52,6 +52,14 @@ bool BlockData::isTransparent() {
         || blockType == BlockType::GLASS
         || blockType == BlockType::LEAF
         || blockType == BlockType::WATER;
+}
+
+bool BlockData::isFlora() {
+    BlockType blockType = getType();
+    return blockType == BlockType::GRASS
+        || blockType == BlockType::RED_FLOWER
+        || blockType == BlockType::YELLOW_FLOWER
+        || blockType == BlockType::BLUE_FLOWER;
 }
 
 }

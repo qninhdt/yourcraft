@@ -9,6 +9,7 @@ add_executable(YourCraft
     src/graphic/display.cpp
     src/graphic/block_vertex.cpp
     src/graphic/skybox.cpp
+    src/graphic/flora_vertex.cpp
     src/gl/mesh.cpp
     src/gl/common.cpp
     src/gl/shader.cpp

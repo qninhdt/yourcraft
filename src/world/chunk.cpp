@@ -4,6 +4,7 @@
 #include "graphic/block_vertex.h"
 #include <iostream>
 #include <random>
+#include "graphic/flora_vertex.h"
 
 namespace yc::world {
 
@@ -18,6 +19,7 @@ const std::array<glm::ivec3, 6> directionsToCheck = {{
 
 Chunk::Chunk():
     needToBuildMesh(false),
+    floraMesh(nullptr),
     opaqueMesh(nullptr),
     transparentMesh(nullptr) {
 }
@@ -52,6 +54,10 @@ void Chunk::buildMesh() {
     size_t chunkTransparentVerticesSize = 0;
     size_t chunkTransparentIndicesSize = 0;
 
+    std::vector<float> floraVertexCoord, floraVertexUv;
+    std::vector<uint32_t> floraVertexTexCoord;
+    std::vector<uint32_t> floraIndices;
+
     static uint32_t chunkOpaqueVertices[300000];
     static uint32_t chunkOpaqueIndices[500000];
     static uint32_t chunkTransparentVertices[300000];
@@ -67,6 +73,33 @@ void Chunk::buildMesh() {
     for (int32_t z=0; z<Chunk::Width; ++z) {
         BlockData& block = this->blocks[x][y][z];
         BlockType blockType = block.getType();
+
+        if (block.isFlora()) {
+            uint32_t id = floraVertexCoord.size()/3;
+            for (int i=0;i<8;++i) {
+                float vx = x + yc::graphic::FloraVertices[i][0];
+                float vy = y + yc::graphic::FloraVertices[i][1];
+                float vz = z + yc::graphic::FloraVertices[i][2];
+                float uvX = yc::graphic::FloraTexcoords[i][0];
+                float uvY = yc::graphic::FloraTexcoords[i][1];
+                uint32_t texCoord = yc::graphic::GetFloraTexureCoord(blockType, (i<4) ? 1 : 2);
+                
+                floraVertexCoord.push_back(vx);
+                floraVertexCoord.push_back(vy);
+                floraVertexCoord.push_back(vz);
+                floraVertexUv.push_back(uvX);
+                floraVertexUv.push_back(uvY);
+                floraVertexTexCoord.push_back(texCoord);
+            }
+            std::vector<uint32_t> indices {
+                id+0, id+1, id+2,
+                id+0, id+2, id+3,
+                id+4, id+5, id+6,
+                id+4, id+6, id+7,
+            };
+            floraIndices.insert(floraIndices.end(), indices.begin(), indices.end());
+            continue;
+        }
 
         if (blockType == BlockType::AIR) continue;
         
@@ -136,32 +169,44 @@ void Chunk::buildMesh() {
         }
     }
 
-    if (chunkOpaqueIndices != 0) {
-        if (opaqueMesh == nullptr) {
-            opaqueMesh = std::make_shared<yc::gl::Mesh>();
-            opaqueMesh->init();
-            opaqueMesh->bind();
-            opaqueMesh->addIndices(&chunkOpaqueIndices[0], chunkOpaqueIndicesSize);
-            opaqueMesh->addStaticBuffer(1, &chunkOpaqueVertices[0], chunkOpaqueVerticesSize);
-        }  else {
-            opaqueMesh->bind();
-            opaqueMesh->updateIndices(&chunkOpaqueIndices[0], chunkOpaqueIndicesSize);
-            opaqueMesh->updateStaticBuffer(0, &chunkOpaqueVertices[0], chunkOpaqueVerticesSize);
-        }
+    if (opaqueMesh != nullptr) {
+        opaqueMesh->bind();
+        opaqueMesh->updateIndices(&chunkOpaqueIndices[0], chunkOpaqueIndicesSize);
+        opaqueMesh->updateStaticBuffer(0, &chunkOpaqueVertices[0], chunkOpaqueVerticesSize);
+    } else if (chunkOpaqueIndices != 0) {
+        opaqueMesh = std::make_shared<yc::gl::Mesh>();
+        opaqueMesh->init();
+        opaqueMesh->bind();
+        opaqueMesh->addIndices(&chunkOpaqueIndices[0], chunkOpaqueIndicesSize);
+        opaqueMesh->addStaticBuffer(1, &chunkOpaqueVertices[0], chunkOpaqueVerticesSize);
     }
 
-    if (chunkTransparentIndices != 0) {
-        if (transparentMesh == nullptr) {
-            transparentMesh = std::make_shared<yc::gl::Mesh>();
-            transparentMesh->init();
-            transparentMesh->bind();
-            transparentMesh->addIndices(&chunkOpaqueIndices[0], chunkOpaqueIndicesSize);
-            transparentMesh->addStaticBuffer(1, &chunkOpaqueVertices[0], chunkOpaqueVerticesSize);
-        }  else {
-            transparentMesh->bind();
-            transparentMesh->updateIndices(&chunkTransparentIndices[0], chunkTransparentIndicesSize);
-            transparentMesh->updateStaticBuffer(0, &chunkTransparentVertices[0], chunkTransparentVerticesSize);
-        }
+    if (transparentMesh != nullptr) {
+        transparentMesh->bind();
+        transparentMesh->updateIndices(&chunkTransparentIndices[0], chunkTransparentIndicesSize);
+        transparentMesh->updateStaticBuffer(0, &chunkTransparentVertices[0], chunkTransparentVerticesSize);
+    } else if (chunkTransparentIndices != 0) {
+        transparentMesh = std::make_shared<yc::gl::Mesh>();
+        transparentMesh->init();
+        transparentMesh->bind();
+        transparentMesh->addIndices(&chunkOpaqueIndices[0], chunkOpaqueIndicesSize);
+        transparentMesh->addStaticBuffer(1, &chunkOpaqueVertices[0], chunkOpaqueVerticesSize);
+    }
+
+    if (floraMesh != nullptr) {
+        floraMesh->bind();
+        floraMesh->updateIndices(floraIndices);
+        floraMesh->updateStaticBuffer(0, floraVertexCoord);
+        floraMesh->updateStaticBuffer(1, floraVertexUv);
+        floraMesh->updateStaticBuffer(2, floraVertexTexCoord);
+    } else if (floraIndices.size()>0) {
+        floraMesh = std::make_shared<yc::gl::Mesh>();
+        floraMesh->init();
+        floraMesh->bind();
+        floraMesh->addIndices(floraIndices);
+        floraMesh->addStaticBuffer(3, floraVertexCoord);
+        floraMesh->addStaticBuffer(2, floraVertexUv);
+        floraMesh->addStaticBuffer(1, floraVertexTexCoord);
     }
 
     this->needToBuildMesh = false;
@@ -201,6 +246,12 @@ void Chunk::renderTransparent() {
     if (transparentMesh == nullptr) return;
     transparentMesh->bind();
     transparentMesh->draw();
+}
+
+void Chunk::renderFlora() {
+    if (floraMesh == nullptr) return;
+    floraMesh->bind();
+    floraMesh->draw();
 }
 
 void Chunk::setBlockData(const glm::ivec3& coord, BlockData blockData) {

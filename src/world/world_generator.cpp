@@ -5,7 +5,7 @@
 namespace yc::world {
 
 static BlockData dirtBlock { BlockType::DIRT };
-static BlockData grassBlock { BlockType::GRASS };
+static BlockData grassBlock { BlockType::GRASS_BLOCK };
 static BlockData stoneBlock { BlockType::STONE };
 static BlockData sandBlock { BlockType::SAND };
 static BlockData snowBlock { BlockType::SNOW };
@@ -66,6 +66,14 @@ std::shared_ptr<Chunk> WorldGenerator::generateChunk(World* world,
         float forestNoise = mountainNoise.GetNoise(noiseX*4, noiseZ*4);
         forestNoise = (forestNoise+1)/2;
 
+        float grassNoise = mountainNoise.GetNoise(noiseX*256, noiseZ*256);
+        grassNoise = (grassNoise+1)/2;
+        grassNoise = pow(grassNoise, 2);
+
+        float flowerNoise = mountainNoise.GetNoise(noiseX*128, noiseZ*128);
+        flowerNoise = (flowerNoise+1)/2;
+        flowerNoise = pow(flowerNoise, 2);
+
         int32_t height = noiseValue * 220 + 30;
         
         glm::ivec3 coord { x, 0, z }; 
@@ -73,13 +81,24 @@ std::shared_ptr<Chunk> WorldGenerator::generateChunk(World* world,
             chunk->setBlockData(coord, getBlockData(coord.y, height, noise));
         }
 
-        if (treeNoise > 0.45f && forestNoise > 0.5f) {
-            if (0<x && x<15 && 0<z && z<15 && height>50 && height<100) {
-                generateTreeAt(chunk, coord, 1.0f);
+        if (height>50 && height<100) {
+            if (forestNoise > 0.5f && treeNoise > 0.45f) {
+                if (0<x && x<15 && 0<z && z<15) {
+                    generateTreeAt(chunk, coord, treeNoise);
+                }
+            } else if (forestNoise > 0.45f && grassNoise>0.6) {
+                chunk->setBlockData(coord, { BlockType::GRASS });
+            } else if (flowerNoise>0.7) {
+                if (flowerNoise>0.73)
+                    chunk->setBlockData(coord, { BlockType::RED_FLOWER });
+                else if (flowerNoise>0.72)
+                    chunk->setBlockData(coord, { BlockType::YELLOW_FLOWER });
+                else if (flowerNoise>0.7)
+                    chunk->setBlockData(coord, { BlockType::BLUE_FLOWER });
             }
-        } 
+        }
 
-        for (;coord.y<=44;++coord.y) {
+        for (;coord.y<=45;++coord.y) {
             chunk->setBlockData(coord, { BlockType::WATER });
         }
     }
@@ -90,13 +109,14 @@ std::shared_ptr<Chunk> WorldGenerator::generateChunk(World* world,
 }
 
 void WorldGenerator::generateTreeAt(std::shared_ptr<Chunk> chunk, const glm::ivec3& coord, float noise) {
-    int32_t height = 4;
-    int32_t leafHeight = 3;
+    int32_t height = noise>6 ? 6 : 4;
+    int32_t leafHeight = noise>6 ? 5 : 4;
 
     // build leafs
     for (int y=height-(leafHeight+1)/2; y<=height+leafHeight/2;++y) {
         for (int x=-1;x<=1;++x) {
             for (int z=-1;z<=1;++z) {
+                if ((y == height+leafHeight/2 || y == height-(leafHeight+1)/2) && ((x==-1&&z==-1) || (x==-1&&z==1) || (x==1&&z==-1) || (x==1&&z==1))) continue;
                 chunk->setBlockData({ coord.x+x, coord.y+y, coord.z+z }, leafBlock);
             }
         }

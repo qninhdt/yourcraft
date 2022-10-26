@@ -112,6 +112,7 @@ void Display::drawFrame(yc::Player* player, yc::world::World* world) {
 
     // render opaque
     world->renderOpaque(player->getCamera());
+    world->renderFlora(player->getCamera());
 
     // render transparent
     glDepthMask(GL_FALSE);

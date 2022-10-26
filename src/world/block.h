@@ -10,6 +10,7 @@ enum class BlockType {
     AIR = 0,
     DIRT,
     GRASS,
+    GRASS_BLOCK,
     SNOW,
     LEAF,
     SAND,
@@ -17,6 +18,9 @@ enum class BlockType {
     WOOD,
     GLASS,
     WATER,
+    RED_FLOWER,
+    YELLOW_FLOWER,
+    BLUE_FLOWER,
     NONE,
 };
 
@@ -45,6 +49,7 @@ public:
 
     bool isOpaque();
     bool isTransparent();
+    bool isFlora();
 
 private:
     // |  bit  |    name    |
