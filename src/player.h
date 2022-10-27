@@ -23,6 +23,8 @@ public:
     void moveUp();
     void moveDown();
 
+    bool checkIntersect(const glm::vec3& delta);
+
     void init(int32_t width, int32_t height);
 
     bool isSelectingBlock();

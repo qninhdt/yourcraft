@@ -269,4 +269,85 @@ size_t World::HashChunkCoord::operator() (const glm::ivec2& coord) const noexcep
     return hashX;
 }
 
+World::RayCastResult World::raycastCheck(const glm::vec3& position, const glm::vec3& direction, bool discardFlora, bool discardWater) {
+    RayCastResult result = {
+        .face = { 0, 0, 0 }
+    };
+    
+    float x = floor(position.x);
+    float y = floor(position.y);
+    float z = floor(position.z);
+    float dx = direction.x;
+    float dy = direction.y;
+    float dz = direction.z;
+    int32_t stepX = util::SignNum(dx);
+    int32_t stepY = util::SignNum(dy);
+    int32_t stepZ = util::SignNum(dz);
+
+    float tMaxX = util::IntBound(position.x, dx);
+    float tMaxY = util::IntBound(position.y, dy);
+    float tMaxZ = util::IntBound(position.z, dz);
+
+    float tDeltaX = stepX/dx;
+    float tDeltaY = stepY/dy;
+    float tDeltaZ = stepZ/dz;
+
+    float radius = 500.0/sqrt(dx*dx+dy*dy+dz*dz);
+
+    while (true) {
+        yc::world::BlockData block = getBlockDataIfLoadedAt({ x, y, z });
+        yc::world::BlockType blockType = block.getType();
+
+        if (blockType == yc::world::BlockType::NONE) {
+            result.block.setType(BlockType::NONE);
+            break;
+        } else if (blockType != yc::world::BlockType::AIR && 
+            !(discardWater && blockType == yc::world::BlockType::WATER) &&
+            !(discardFlora && block.isFlora())) {
+            result.block = block;
+            result.coord = { x, y, z };
+            break;
+        }
+
+        if (tMaxX < tMaxY) {
+            if (tMaxX < tMaxZ) {
+                if (tMaxX > radius) { result.block.setType(BlockType::NONE); break; }
+                // Update which cube we are now in.
+                x += stepX;
+                // Adjust tMaxX to the next X-oriented boundary crossing.
+                tMaxX += tDeltaX;
+                // Record the normal vector of the cube face we entered.
+                result.face[0] = -stepX;
+                result.face[1] = 0;
+                result.face[2] = 0;
+            } else {
+                if (tMaxZ > radius) { result.block.setType(BlockType::NONE); break; }
+                z += stepZ;
+                tMaxZ += tDeltaZ;
+                result.face[0] = 0;
+                result.face[1] = 0;
+                result.face[2] = -stepZ;
+            }
+        } else {
+            if (tMaxY < tMaxZ) {
+                if (tMaxY > radius) { result.block.setType(BlockType::NONE); break; }
+                y += stepY;
+                tMaxY += tDeltaY;
+                result.face[0] = 0;
+                result.face[1] = -stepY;
+                result.face[2] = 0;
+            } else {
+                if (tMaxZ > radius) { result.block.setType(BlockType::NONE); break; }
+                z += stepZ;
+                tMaxZ += tDeltaZ;
+                result.face[0] = 0;
+                result.face[1] = 0;
+                result.face[2] = -stepZ;
+            }
+        }
+    }
+
+    return result;
+}
+
 }

@@ -17,6 +17,12 @@ public:
         size_t operator() (const glm::ivec2& coord) const noexcept;
     };
 
+    struct RayCastResult {
+        BlockData block;
+        glm::ivec3 coord;
+        glm::ivec3 face;
+    };
+
     static glm::ivec2 GetChunkCoordOf(const glm::ivec3& coord);
 
     World(Persistence* persistence);
@@ -50,6 +56,8 @@ public:
     void saveChunks();
 
     void spawnTreeAt(const glm::ivec3& coord);
+
+    RayCastResult raycastCheck(const glm::vec3& position, const glm::vec3& direction, bool discardFlora, bool discardWater);
 
     int32_t getSeed() const;
 
