@@ -77,4 +77,6 @@ private:
     BlockFaceDirection faceDirection;
 };
 
+std::string GetBlockName(BlockType blockType);
+
 }

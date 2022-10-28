@@ -1,4 +1,5 @@
 #include "world/block.h"
+#include <string>
 
 namespace yc::world {
 
@@ -60,6 +61,39 @@ bool BlockData::isFlora() {
         || blockType == BlockType::RED_FLOWER
         || blockType == BlockType::YELLOW_FLOWER
         || blockType == BlockType::BLUE_FLOWER;
+}
+
+std::string GetBlockName(BlockType blockType) {
+    switch (blockType) {
+        case BlockType::GRASS_BLOCK:
+            return "Grass Block";
+        case BlockType::DIRT:
+            return "Dirt Block";
+        case BlockType::STONE:
+            return "Stone Block";
+        case BlockType::LEAF:
+            return "Leaf";
+        case BlockType::WOOD:
+            return "Wood Block";
+        case BlockType::SNOW:
+            return "Snow Block";
+        case BlockType::GLASS:
+            return "Glass Block";
+        case BlockType::SAND:
+            return "Sand Block";
+        case BlockType::WATER:
+            return "Water";
+        case BlockType::RED_FLOWER:
+            return "Red Flower";
+        case BlockType::BLUE_FLOWER:
+            return "Blue Flower";
+        case BlockType::YELLOW_FLOWER:
+            return "Yellow Flower";
+        case BlockType::GRASS:
+            return "Grass";
+        default:
+            return "None";
+    }
 }
 
 }

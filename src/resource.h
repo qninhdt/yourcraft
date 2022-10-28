@@ -1,7 +1,9 @@
 #pragma once
 
+#include <map>
 #include "gl/shader.h"
 #include "gl/texture.h"
+#include "world/block.h"
 
 namespace yc {
 
@@ -19,6 +21,8 @@ public:
     static yc::gl::Shader CompositeShader;
     static yc::gl::Texture GameTexure;
     static yc::gl::Texture CrossHairTexture;
+
+    static std::map<yc::world::BlockType, yc::gl::Texture> BlockIcons;
 
     static void Load();
 

@@ -13,7 +13,9 @@ namespace yc::graphic {
 class Display {
 
 public:
-    Display(int32_t width, int32_t height);
+    Display();
+
+    ~Display();
 
     void init();
 
@@ -23,20 +25,11 @@ public:
 
     void nextFrame();
 
-    int32_t getWidth();
-
-    int32_t getHeight();
-
     void toggleLineMode();
 
 private:
 
     glm::vec3 clearColor = { 0.2f, 0.3f, 0.3f };
-
-    int32_t width;
-    int32_t height;
-
-    gl::FrameBuffer frame;
 
     bool lineMode;
 

@@ -13,10 +13,13 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 void sizeCallback(GLFWwindow* window, int width, int height);
 void mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods);
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 Application::Application(int32_t width, int32_t height, const std::string& title):
-    stopped(false),
-    display(width, height) {
+    stopped(false) {
+
+    Application::Width = width;
+    Application::Height = height;
 
     // init GLFW
     glfwInit();
@@ -51,6 +54,7 @@ Application::Application(int32_t width, int32_t height, const std::string& title
     glfwSetMouseButtonCallback(window, mouseButtonCallBack);
     glfwSetCursorPosCallback(window, mouseCallback);
     glfwSetFramebufferSizeCallback(window, sizeCallback);
+    glfwSetScrollCallback(window, scrollCallback);
 
     // disable cursor
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
@@ -58,12 +62,14 @@ Application::Application(int32_t width, int32_t height, const std::string& title
     Resource::Load();
 
     persistence = new Persistence();
+
+    gui.init(window);
     
     world = new yc::world::World(persistence);
     world->init();
 
     player = new Player(50.0f, world);
-    player->init(width, height);
+    player->init();
 
     display.init();
 }
@@ -78,9 +84,6 @@ void Application::process() {
     Application::deltaTime = (currentTime-previousTime)/frameCount;
     
     if (currentTime - previousTime >= 0.05) {
-        std::string s = "Yourcraft - FPS: " + std::to_string(static_cast<int>(1/deltaTime));
-        glfwSetWindowTitle(window, s.c_str());
-
         frameCount = 0;
         previousTime = currentTime;
     }
@@ -109,10 +112,14 @@ void Application::process() {
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         player->moveDown();
 
+    gui.update(world, player);
+
     player->update();
     world->update(player->getCamera());
 
     display.drawFrame(player, world);
+
+    gui.render();
 
     glfwSwapBuffers(window);
     glfwPollEvents();
@@ -145,8 +152,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 void mouseCallback(GLFWwindow* window, double xpos, double ypos) {
     Application* app = (Application*) glfwGetWindowUserPointer(window);
 
-    static float lastX = app->getDisplay()->getWidth() / 2;
-    static float lastY = app->getDisplay()->getHeight() / 2;
+    static float lastX = Application::Width / 2;
+    static float lastY = Application::Height / 2;
 
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos; 
@@ -171,9 +178,8 @@ void mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods) {
         if (app->player->isSelectingBlock()) {
             app->world->setBlockDataIfLoadedAt(
                 app->player->getSelectingBlock() + app->player->getSelectingFace(),
-                { world::BlockType::BLUE_FLOWER }
+                { app->player->getCurrentBlockType() }
             );
-            // app->world->spawnTreeAt(app->player->getSelectingBlock() + app->player->getSelectingFace());
         }
     }
 
@@ -185,15 +191,26 @@ void mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods) {
 }
 
 void sizeCallback(GLFWwindow* window, int width, int height) {
+    Application* app = (Application*) glfwGetWindowUserPointer(window);
     glViewport(0, 0, width, height);
+    Application::Width = width;
+    Application::Height = height;
+    app->player->getCamera()->update();
+}
+
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
+    Application* app = (Application*) glfwGetWindowUserPointer(window);
+    
+    if (yoffset < 0) {
+        app->player->nextSlot();
+    } else {
+        app->player->prevSlot();
+    }
 }
 
 void Application::stop() {
     stopped = true;
     glfwSetWindowShouldClose(window, true);
-}
-
-Application::~Application() {
 }
 
 float Application::deltaTime = 1.0f/60;
@@ -206,5 +223,12 @@ void Application::terminate() {
     world->saveChunks();
     glfwTerminate();
 }
+
+Application::~Application() {
+    
+}
+
+int32_t Application::Width;
+int32_t Application::Height;
 
 }

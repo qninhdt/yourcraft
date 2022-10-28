@@ -23,14 +23,30 @@ add_executable(YourCraft
     src/world/world_generator.cpp
     src/persistence.cpp
     src/player.cpp
+    src/gui/gui.cpp
+    src/gui/game_scene.cpp
+    src/graphic/crosshair.cpp
     deps/glad/src/glad.c
+)
+
+add_library(imgui SHARED
+    deps/imgui/imgui_draw.cpp
+    deps/imgui/imgui_impl_glfw.cpp
+    deps/imgui/imgui_impl_opengl3.cpp
+    deps/imgui/imgui_tables.cpp
+    deps/imgui/imgui_widgets.cpp
+    deps/imgui/imgui.cpp
 )
 
 # target_compile_options(YourCraft PRIVATE -Wall -Wextra -Wpedantic -Werror)
 
+target_link_libraries(imgui ${CMAKE_SOURCE_DIR}/build/glfw3.dll)
+target_link_libraries(YourCraft imgui)
 target_link_libraries(YourCraft ${CMAKE_SOURCE_DIR}/build/glfw3.dll)
+
 include_directories(src)
 include_directories(deps/glad/include)
 include_directories(deps/GLFW)
 include_directories(deps/glm)
+include_directories(deps/imgui)
 include_directories(deps)

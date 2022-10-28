@@ -11,7 +11,8 @@ class Camera {
 
 public:
     Camera();
-    void init(uint32_t screenWidth, uint32_t screenHeight);
+    void init();
+    void update();
     glm::mat4 getViewMatrix() const;
     glm::mat4 getProjectionMatrix() const;
     glm::mat4 getProjectionViewMatrix() const;

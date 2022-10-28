@@ -189,8 +189,8 @@ void Chunk::buildMesh() {
         transparentMesh = std::make_shared<yc::gl::Mesh>();
         transparentMesh->init();
         transparentMesh->bind();
-        transparentMesh->addIndices(&chunkOpaqueIndices[0], chunkOpaqueIndicesSize);
-        transparentMesh->addStaticBuffer(1, &chunkOpaqueVertices[0], chunkOpaqueVerticesSize);
+        transparentMesh->addIndices(&chunkTransparentIndices[0], chunkTransparentIndicesSize);
+        transparentMesh->addStaticBuffer(1, &chunkTransparentVertices[0], chunkTransparentVerticesSize);
     }
 
     if (floraMesh != nullptr) {

@@ -22,20 +22,26 @@ void World::update(yc::Camera* camera) {
     };
 
     const int32_t viewDistance = 24;
-    std::vector<std::shared_ptr<Chunk>> shouldBeUnloadedChunks;
+    const int32_t maxUnloadChunkPerFrame = 4;
+    const int32_t maxChunksLoadPerFrame = 2;
+
+    int32_t unloadedChunkCount = 0;
     for (const auto& [chunkCoord, chunk]: this->chunks) {
-        if (Chunk::DistanceTo(chunkCoord, cameraChunkCoord) > viewDistance) {
-            shouldBeUnloadedChunks.push_back(chunk);
+        if (Chunk::DistanceTo(chunkCoord, cameraChunkCoord) > viewDistance && maxUnloadChunkPerFrame>unloadedChunkCount) {
+            shouldBeUnloadedChunks.push(chunk);
+            unloadedChunkCount += 1;
         }
     }
 
-    for(const auto& chunk: shouldBeUnloadedChunks) {
+    while (!shouldBeUnloadedChunks.empty() ) {
+        auto chunk = shouldBeUnloadedChunks.front();
+        shouldBeUnloadedChunks.pop();
+
         unloadChunk(chunk->getCoord());
     }
     persistence->syncRegionFiles();
 
     std::atomic_int chunkCount = 0;
-    const int32_t maxChunksLoadPerFrame = 2;
 
     int32_t x=0, z=0, dx=0, dz=-1;
     int32_t size = viewDistance*2+1;

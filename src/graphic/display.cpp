@@ -1,5 +1,6 @@
 #include <glad/glad.h>
 #include "graphic/display.h"
+#include "application.h"
 #include <iostream>
 
 namespace yc::graphic {
@@ -14,16 +15,12 @@ float quadVertices[] = {
 	-1.0f, -1.0f, 0.0f, 0.0f, 0.0f
 };
 
-Display::Display(int32_t width, int32_t height):
-    width(width),
-    height(height),
-    frame(width, height),
+Display::Display():
     lineMode(false)
 {}
 
 void Display::init() {
-    frame.init();
-    crosshair.init(width, height);
+    crosshair.init();
     skybox.init();
     blockOutline.init();
 
@@ -32,14 +29,14 @@ void Display::init() {
 
     glGenTextures(1, &opaqueTexture);
 	glBindTexture(GL_TEXTURE_2D, opaqueTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_HALF_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, Application::Width, Application::Height, 0, GL_RGBA, GL_HALF_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
     glGenTextures(1, &depthTexture);
 	glBindTexture(GL_TEXTURE_2D, depthTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, Application::Width, Application::Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, opaqueFBO);
@@ -51,14 +48,14 @@ void Display::init() {
 
     glGenTextures(1, &accumTexture);
 	glBindTexture(GL_TEXTURE_2D, accumTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_HALF_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, Application::Width, Application::Height, 0, GL_RGBA, GL_HALF_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
     glGenTextures(1, &revealTexture);
 	glBindTexture(GL_TEXTURE_2D, revealTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, Application::Width, Application::Height, 0, GL_RED, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -94,6 +91,21 @@ void Display::prepareFrame() {
 void Display::drawFrame(yc::Player* player, yc::world::World* world) {
     glm::vec4 zeroFillerVec(0.0f);
 	glm::vec4 oneFillerVec(1.0f);
+    
+	glBindTexture(GL_TEXTURE_2D, opaqueTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, Application::Width, Application::Height, 0, GL_RGBA, GL_HALF_FLOAT, NULL);
+
+	glBindTexture(GL_TEXTURE_2D, depthTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, Application::Width, Application::Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+    glBindTexture(GL_TEXTURE_2D, accumTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, Application::Width, Application::Height, 0, GL_RGBA, GL_HALF_FLOAT, NULL);
+
+    glBindTexture(GL_TEXTURE_2D, revealTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, Application::Width, Application::Height, 0, GL_RED, GL_FLOAT, NULL);
+
+
+    crosshair.update();
 
     if (lineMode) {
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
@@ -180,16 +192,12 @@ void Display::nextFrame() {
     
 }
 
-int32_t Display::getHeight() {
-    return height;
-}
-
-int32_t Display::getWidth() {
-    return width;
-}
-
 void Display::toggleLineMode() {
     lineMode = !lineMode;
+}
+
+Display::~Display() {
+    
 }
 
 }

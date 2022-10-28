@@ -27,9 +27,12 @@ void main() {
     coord.y += (vert_pos.y) * sprite_size;
 
     vec4 color = texture(game_texture, coord);
-    // float weight = clamp(pow(min(1.0, color.a * 10.0) + 0.01, 3.0) * 1e8 * pow(1.0 - gl_FragCoord.z * 0.9, 3.0), 1e-2, 3e3);
-    // accum = vec4(color.rgb * color.a, color.a) * weight;
     float w = weight(gl_FragCoord.z, color.w);
+
+    if (color.w == 1) {
+        w *= 10;
+    }
+
     accum = vec4(color.xyz, color.w) * w;
     reveal = color.a;
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <unordered_map>
-#include <unordered_set>
+#include <queue>
 #include "persistence.h"
 #include "world/world_generator.h"
 #include "world/chunk.h"
@@ -64,6 +64,7 @@ public:
 private:
 
     std::unordered_map<glm::ivec2, std::shared_ptr<Chunk>, HashChunkCoord> chunks;
+    std::queue<std::shared_ptr<Chunk>> shouldBeUnloadedChunks;
 
     WorldGenerator generator;
     Persistence* persistence;

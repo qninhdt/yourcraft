@@ -22,12 +22,30 @@ const glm::vec3 PlayerBoundBox[8] = {
 Player::Player(float speed, yc::world::World* world):
     speed(speed),
     world(world),
-    selectingBlock(false) {
+    selectingBlock(false),
+    currentSlot(0) {
 
 }
 
-void Player::init(int32_t width, int32_t height) {
-    camera.init(width, height);
+void Player::init() {
+    camera.init();
+    camera.update();
+
+    inventory = {
+        yc::world::BlockType::GRASS_BLOCK,
+        yc::world::BlockType::DIRT,
+        yc::world::BlockType::STONE,
+        yc::world::BlockType::GLASS,
+        yc::world::BlockType::SAND,
+        yc::world::BlockType::WATER,
+        yc::world::BlockType::WOOD,
+        yc::world::BlockType::LEAF,
+        yc::world::BlockType::GRASS,
+        yc::world::BlockType::SNOW,
+        yc::world::BlockType::RED_FLOWER,
+        yc::world::BlockType::YELLOW_FLOWER,
+        yc::world::BlockType::BLUE_FLOWER,
+    };
 }
 
 void Player::update() {
@@ -40,7 +58,9 @@ void Player::update() {
     if (selectingBlock) {
         selectingBlockCoord = raycast.coord;
         selectingFace = raycast.face;
+        selectingBlockType = raycast.block.getType();
     }
+
 }
 
 Camera* Player::getCamera() {
@@ -53,6 +73,10 @@ glm::ivec3 Player::getSelectingBlock() {
 
 glm::ivec3 Player::getSelectingFace() {
     return selectingFace;
+}
+
+yc::world::BlockType Player::getSelectingBlockType() {
+    return selectingBlockType;
 }
 
 bool Player::isSelectingBlock() {
@@ -109,6 +133,26 @@ bool Player::checkIntersect(const glm::vec3& delta) {
     }
 
     return false;
+}
+
+void Player::nextSlot() {
+    currentSlot = (currentSlot+1) % inventory.size(); 
+}
+
+void Player::prevSlot() {
+    currentSlot = (currentSlot+inventory.size()-1) % inventory.size();
+}
+
+uint32_t Player::getCurrentSlot() {
+    return currentSlot;
+}
+
+world::BlockType Player::getCurrentBlockType() {
+    return inventory[currentSlot];
+}
+
+std::vector<yc::world::BlockType> Player::getInventory() {
+    return inventory;
 }
 
 void Player::moveUp() {

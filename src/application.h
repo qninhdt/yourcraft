@@ -10,6 +10,7 @@
 #include "graphic/block_outline.h"
 #include "world/world.h"
 #include "graphic/crosshair.h"
+#include "gui/gui.h"
 
 namespace yc {
 
@@ -17,6 +18,8 @@ class Application {
 
 public:
     static float GetDeltaTime();
+    static int32_t Width;
+    static int32_t Height;
 
     Application(int32_t width, int32_t height, const std::string& title);
     ~Application();
@@ -39,12 +42,17 @@ private:
     friend void mouseCallback(GLFWwindow* window, double xpos, double ypos);
     friend void sizeCallback(GLFWwindow* window, int width, int height);
     friend void mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods);
+    friend void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
     static float deltaTime;
+
+    static int32_t width;
+    static int32_t height;
 
     bool stopped;
 
     graphic::Display display;
+    gui::GUI gui;
 
     GLFWwindow* window;
     yc::world::World* world;
