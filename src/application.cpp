@@ -16,7 +16,7 @@ void mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods);
 void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 Application::Application(int32_t width, int32_t height, const std::string& title):
-    stopped(false) {
+    paused(false) {
 
     Application::Width = width;
     Application::Height = height;
@@ -26,9 +26,6 @@ Application::Application(int32_t width, int32_t height, const std::string& title
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    // init stb_image
-    stbi_set_flip_vertically_on_load(true); 
 
     // create window
     window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
@@ -76,9 +73,7 @@ Application::Application(int32_t width, int32_t height, const std::string& title
     // set icon
     int iconWidth, iconHeight, iconChannel;
 
-    stbi_set_flip_vertically_on_load(false);
     uint8_t* iconData = stbi_load("./resources/yourcraft.png", &iconWidth, &iconHeight, &iconChannel, STBI_default);
-    stbi_set_flip_vertically_on_load(true);
 
     GLFWimage icons;
     icons.width = iconWidth;
@@ -102,34 +97,27 @@ void Application::process() {
         previousTime = currentTime;
     }
 
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        stop();
+    if (!paused) {
+        if (glfwGetKey(window, GLFW_KEY_F5) == GLFW_PRESS) {
+            world->reloadChunks();
+        }
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            player->moveFront();
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            player->moveBack();
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            player->moveLeft();
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            player->moveRight();
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+            player->moveUp();
+        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            player->moveDown();
+        player->update();
+        world->update(player->getCamera());
     }
 
-    if (glfwGetKey(window, GLFW_KEY_F5) == GLFW_PRESS) {
-        world->reloadChunks();
-    }
-
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        player->moveFront();
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        player->moveBack();
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        player->moveLeft();
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        player->moveRight();
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        player->moveUp();
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        player->moveDown();
-
-    gui.update(world, player);
-
-    player->update();
-    world->update(player->getCamera());
+    gui.update(this, world, player);
 
     display.drawFrame(player, world);
 
@@ -144,7 +132,7 @@ yc::graphic::Display* Application::getDisplay() {
 }
 
 bool Application::isStopped() {
-    return stopped;
+    return glfwWindowShouldClose(window);
 }
 
 Player* Application::getPlayer() {
@@ -154,12 +142,22 @@ Player* Application::getPlayer() {
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     Application* app = (Application*) glfwGetWindowUserPointer(window);
     
-    if (glfwGetKey(app->window, GLFW_KEY_F3) == GLFW_PRESS) {
-        app->display.toggleLineMode();
+    if (!app->paused) {
+        if (glfwGetKey(app->window, GLFW_KEY_F3) == GLFW_PRESS) {
+            app->display.toggleLineMode();
+        }
+
+        if (glfwGetKey(app->window, GLFW_KEY_F1) == GLFW_PRESS) {
+            app->world->saveChunks();
+        }
     }
 
-    if (glfwGetKey(app->window, GLFW_KEY_F1) == GLFW_PRESS) {
-        app->world->saveChunks();
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        if (app->paused) {
+            app->resumeGame();
+        } else {
+            app->pauseGame();
+        }
     }
 }
 
@@ -168,38 +166,42 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos) {
 
     static float lastX = Application::Width / 2;
     static float lastY = Application::Height / 2;
-
+    
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos; 
     lastX = xpos;
     lastY = ypos;
 
-    const float sensitivity = 0.2f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
+    if (!app->paused) {
+        const float sensitivity = 0.2f;
+        xoffset *= sensitivity;
+        yoffset *= sensitivity;
 
-    Camera* camera = app->player->getCamera();
-    camera->setOrientation(
-        camera->getPitch() + yoffset,
-        camera->getYaw() + xoffset
-    );
+        Camera* camera = app->player->getCamera();
+        camera->setOrientation(
+            camera->getPitch() + yoffset,
+            camera->getYaw() + xoffset
+        );
+    }
 }
 
 void mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods) {
     Application* app = (Application*) glfwGetWindowUserPointer(window);
 
-    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
-        if (app->player->isSelectingBlock()) {
-            app->world->setBlockDataIfLoadedAt(
-                app->player->getSelectingBlock() + app->player->getSelectingFace(),
-                { app->player->getCurrentBlockType() }
-            );
+    if (!app->paused) {
+        if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+            if (app->player->isSelectingBlock()) {
+                app->world->setBlockDataIfLoadedAt(
+                    app->player->getSelectingBlock() + app->player->getSelectingFace(),
+                    { app->player->getCurrentBlockType() }
+                );
+            }
         }
-    }
 
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        if (app->player->isSelectingBlock()) {
-            app->world->destroyBlockIfLoaded(app->player->getSelectingBlock());
+        if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+            if (app->player->isSelectingBlock()) {
+                app->world->destroyBlockIfLoaded(app->player->getSelectingBlock());
+            }
         }
     }
 }
@@ -215,15 +217,16 @@ void sizeCallback(GLFWwindow* window, int width, int height) {
 void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
     Application* app = (Application*) glfwGetWindowUserPointer(window);
     
-    if (yoffset < 0) {
-        app->player->nextSlot();
-    } else {
-        app->player->prevSlot();
+    if (!app->paused) {
+        if (yoffset < 0) {
+            app->player->nextSlot();
+        } else {
+            app->player->prevSlot();
+        }
     }
 }
 
 void Application::stop() {
-    stopped = true;
     glfwSetWindowShouldClose(window, true);
 }
 
@@ -231,6 +234,18 @@ float Application::deltaTime = 1.0f/60;
 
 float Application::GetDeltaTime() {
     return Application::deltaTime;
+}
+
+void Application::pauseGame() {
+    paused = true;
+    gui.pause(this);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); 
+}
+
+void Application::resumeGame() {
+    paused = false;
+    gui.resume();
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
 }
 
 void Application::terminate() {

@@ -22,6 +22,10 @@ public:
     static yc::gl::Texture GameTexure;
     static yc::gl::Texture CrossHairTexture;
     static yc::gl::Texture IconTexture;
+    static yc::gl::Texture ResumeButtonTexture;
+    static yc::gl::Texture HoveredResumeButtonTexture;
+    static yc::gl::Texture BackButtonTexture;
+    static yc::gl::Texture HoveredBackButtonTexture;
 
     static std::map<yc::world::BlockType, yc::gl::Texture> BlockIcons;
 

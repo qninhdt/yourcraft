@@ -7,7 +7,8 @@ namespace yc::gui {
 
 GUI::GUI():
     gameScene(nullptr),
-    currentScene("game_scene") {
+    pauseScene(nullptr) {
+
 }
 
 GUI::~GUI() {
@@ -33,20 +34,25 @@ void GUI::init(GLFWwindow* window) {
     ImGui_ImplOpenGL3_Init("#version 440");
 
     ImFontConfig config;
-    config.SizePixels = 16;
+    config.SizePixels = 18;
     config.OversampleH = 1;
     config.OversampleV = 1;
     config.PixelSnapH = true;
     io.Fonts->AddFontDefault(&config);
 }
 
-void GUI::update(yc::world::World* world, Player* player) {
-    
-    if (currentScene == "game_scene") {
-        if (gameScene == nullptr) {
-            gameScene = std::make_shared<GameScene>(player);
-        }
+void GUI::update(yc::Application* application, yc::world::World* world, Player* player) {
+    if (gameScene == nullptr) {
+        gameScene = std::make_shared<GameScene>(player);
     }
+}
+
+void GUI::pause(yc::Application* application) {
+    pauseScene = std::make_shared<PauseScene>(application);
+}
+
+void GUI::resume() {
+    pauseScene = nullptr;
 }
 
 void GUI::render() {
@@ -54,8 +60,12 @@ void GUI::render() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     
-    if (currentScene == "game_scene") {
+    if (gameScene) {
         gameScene->render();
+    }
+
+    if (pauseScene) {
+        pauseScene->render();
     }
     
     ImGui::Render();

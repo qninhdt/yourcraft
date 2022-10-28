@@ -25,6 +25,7 @@ add_executable(YourCraft
     src/player.cpp
     src/gui/gui.cpp
     src/gui/game_scene.cpp
+    src/gui/pause_scene.cpp
     src/graphic/crosshair.cpp
     deps/glad/src/glad.c
     config.o

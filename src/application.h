@@ -36,6 +36,10 @@ public:
 
     void terminate();
 
+    void pauseGame();
+
+    void resumeGame();
+
 private:
 
     friend void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -49,7 +53,7 @@ private:
     static int32_t width;
     static int32_t height;
 
-    bool stopped;
+    bool paused;
 
     graphic::Display display;
     gui::GUI gui;

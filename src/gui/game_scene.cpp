@@ -10,10 +10,12 @@ GameScene::GameScene(Player* player):
 }
 
 void GameScene::render() {
+    ImGuiIO& io = ImGui::GetIO();
+    // ImGui::SetWindowFontScale(2);
+
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
     ImGui::SetNextWindowBgAlpha(0.2);
-    // ImGui::SetNextWindowSize(ImVec2(225, 75));
     ImGui::SetNextWindowPos(ImVec2(10, 10));
     ImGui::Begin("debug", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize);                       
     ImGui::Text("FPS: %.0f", 1.0f/yc::Application::GetDeltaTime());
@@ -31,7 +33,6 @@ void GameScene::render() {
 
     ImGui::End();
 
-    auto io = ImGui::GetIO();
     ImGui::SetNextWindowBgAlpha(0.3);
     ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y - 50), ImGuiCond_Always, ImVec2(0.5f,0.5f));
     ImGui::Begin("inventory", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar);

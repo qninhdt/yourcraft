@@ -14,10 +14,15 @@ yc::gl::Shader Resource::CompositeShader;
 yc::gl::Texture Resource::GameTexure;
 yc::gl::Texture Resource::CrossHairTexture;
 yc::gl::Texture Resource::IconTexture;
+yc::gl::Texture Resource::ResumeButtonTexture;
+yc::gl::Texture Resource::HoveredResumeButtonTexture;
+yc::gl::Texture Resource::BackButtonTexture;
+yc::gl::Texture Resource::HoveredBackButtonTexture;
 
 std::map<yc::world::BlockType, yc::gl::Texture> Resource::BlockIcons;
 
 void Resource::Load() {
+
     Resource::OpaqueShader.loadFromFile("opaque.vert", "opaque.frag");
     Resource::TransparentShader.loadFromFile("transparent.vert", "transparent.frag");
     Resource::FloraShader.loadFromFile("flora.vert", "flora.frag");
@@ -26,11 +31,18 @@ void Resource::Load() {
     Resource::BlockOutlineShader.loadFromFile("block_outline.vert", "block_outline.frag");
     Resource::CrossHairShader.loadFromFile("crosshair.vert", "crosshair.frag");
     Resource::CompositeShader.loadFromFile("composite.vert", "composite.frag");
+
+
+    stbi_set_flip_vertically_on_load(true);
     Resource::GameTexure.loadFromFile("./resources/texture.png");
     Resource::CrossHairTexture.loadFromFile("./resources/crosshair.png");
-    // Resource::IconTexture.loadFromFile("./resources/yourcraft.ico");
-
     stbi_set_flip_vertically_on_load(false);
+
+    Resource::ResumeButtonTexture.loadFromFile("./resources/gui/resume_button.png");
+    Resource::HoveredResumeButtonTexture.loadFromFile("./resources/gui/hovered_resume_button.png");
+    Resource::BackButtonTexture.loadFromFile("./resources/gui/back_button.png");
+    Resource::HoveredBackButtonTexture.loadFromFile("./resources/gui/hovered_back_button.png");
+
     Resource::BlockIcons[world::BlockType::GRASS_BLOCK].loadFromFile("./resources/icons/grass_block.png");
     Resource::BlockIcons[world::BlockType::DIRT].loadFromFile("./resources/icons/dirt.png");
     Resource::BlockIcons[world::BlockType::GLASS].loadFromFile("./resources/icons/glass.png");
@@ -44,7 +56,6 @@ void Resource::Load() {
     Resource::BlockIcons[world::BlockType::YELLOW_FLOWER].loadFromFile("./resources/icons/yellow_flower.png");
     Resource::BlockIcons[world::BlockType::GRASS].loadFromFile("./resources/icons/grass.png");
     Resource::BlockIcons[world::BlockType::WATER].loadFromFile("./resources/icons/water.png");
-    stbi_set_flip_vertically_on_load(true);
 }
 
 }
