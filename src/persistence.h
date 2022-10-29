@@ -40,7 +40,7 @@ private:
     struct HashRegionCoord {
         size_t operator() (const glm::ivec2& coord) const noexcept;
     };
-    
+
     std::unordered_map<glm::ivec2, std::shared_ptr<Region>, HashRegionCoord> regions;
 
 };

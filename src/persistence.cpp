@@ -6,7 +6,7 @@
 
 namespace yc {
 
-const std::string Persistence::WorldFolder = "./save/"; 
+const std::string Persistence::WorldFolder = "save/"; 
 
 const size_t ChunkSize = yc::world::Chunk::Volume * sizeof(yc::world::BlockData);
 const size_t RegionHeaderSize = sizeof(int16_t) + sizeof(int16_t) * 32 * 32;

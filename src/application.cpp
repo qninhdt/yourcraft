@@ -254,7 +254,7 @@ void Application::terminate() {
 }
 
 Application::~Application() {
-    
+
 }
 
 int32_t Application::Width;

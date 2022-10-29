@@ -104,7 +104,6 @@ void Display::drawFrame(yc::Player* player, yc::world::World* world) {
     glBindTexture(GL_TEXTURE_2D, revealTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, Application::Width, Application::Height, 0, GL_RED, GL_FLOAT, NULL);
 
-
     crosshair.update();
 
     if (lineMode) {

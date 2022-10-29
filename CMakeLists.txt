@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.0)
 project(YourCraft)
 
+# set(CMAKE_CXX_FLAGS_DEBUG "-g")
+# set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
 add_executable(YourCraft
     src/main.cpp
     src/application.cpp
@@ -40,7 +43,6 @@ add_library(imgui SHARED
     deps/imgui/imgui.cpp
 )
 
-# target_compile_options(YourCraft PRIVATE -Wall -Wextra -Wpedantic -Werror)
 
 target_link_libraries(imgui ${CMAKE_SOURCE_DIR}/build/glfw3.dll)
 target_link_libraries(YourCraft imgui)
