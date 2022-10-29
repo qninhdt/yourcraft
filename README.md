@@ -59,7 +59,7 @@
 
 ---
 
-# 📁 Folder structure
+## 📁 Folder structure
 
     ├── deps                # Libraries (glad, glm, ...) 
     ├── images              # Development process 
