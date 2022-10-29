@@ -1,18 +1,18 @@
 
 <p align="center">
     <img width="100" src="./images/logo.png" alt="YourCraft">
-    <p align="center" style="font-size:42px">YourCraft<p>
+    <h1 align="center">YourCraft</h1>
 </p>
 
 ---
 
-# 💡 Features
+## 💡 Features
 - Infinite, procedurally generated world
 - Full transparency + translucency support
 - Debug widget
 - Inventory GUI
 
-# 🎮 How to play
+## 🎮 How to play
 - `Left Click` to break a block
 - `Right Click` to place a block
 - `WASD` to move around
@@ -20,40 +20,40 @@
 - `Shift` to go down
 - `Esc` to pause game
 
-# 🖼️ Preview
+## 🖼️ Preview
 
 ![YourCraftt](./images/background.png?raw=true)
 
-- ## Mountain
+- ### Mountain
 ![Moutain](./images/big_backgound.png)
 
-- ## Tree
+- ### Tree
 ![Tree](./images/tree.png)
 
-- ## Flower
+- ### Flower
 ![Flower](./images/flower.png)
 
-- ## Grass
+- ### Grass
 ![Grass](./images/grass.png)
 
-- ## Snow
+- ### Snow
 ![Snow](./images/snow.png)
 
-- ## Water
+- ### Water
 
 ![Water](./images/water_1.png)
 ![Water](./images/water_2.png)
 
-- ## Glass
+- ### Glass
 ![Glass](./images/glass.png)
 
-- ## Simple house
+- ### Simple house
 ![Simple house](./images/simple_house.png)
 
-- ## Debug mode
+- ### Debug mode
 ![Debug mode](./images/debug_mode.png)
 
-- ## Pause menu
+- ### Pause menu
 ![Pause menu](./images/pause_menu.png)
 
 ---
@@ -85,7 +85,7 @@
 - [CMake](https://cmake.org/) - For building C++ project
 - [Aseprite](https://www.aseprite.org/) - For game textures
 
-# 🌟 Reference
+# 🌟 References
 - https://learnopengl.com/
 - https://github.com/Isti01/glCraft
 - https://github.com/Hopson97/HopsonCraft
