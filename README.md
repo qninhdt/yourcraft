@@ -2,6 +2,7 @@
 <p align="center">
     <img width="100" src="./images/logo.png" alt="YourCraft">
     <h1 align="center">YourCraft</h1>
+    <p align="center"><i>❝ It is not <strike>Mine</strike>, but <b>Your . . . Craft ! ❞ — @qninhdt</b></i></p>
 </p>
 
 ---
@@ -72,7 +73,7 @@
     |   └── ...
     └── ...
 
-# 📦 Libraries
+## 📦 Libraries
 - [glad](https://github.com/Dav1dde/glad) - Loading OpenGL functions
 - [GLFW](https://github.com/glfw/glfw) - Creating window and reading input 
 - [glm](https://github.com/g-truc/glm) - Math calculating
@@ -80,15 +81,15 @@
 - [imgui](https://github.com/ocornut/imgui) - For creating an awesome GUI
 - [stb_image.h](https://github.com/nothings/stb/blob/master/stb_image.h) - Loading PNG textures
 
-# 🔨 Tools
+## 🔨 Tools
 - [Visual Studio Code](https://code.visualstudio.com/)
 - [CMake](https://cmake.org/) - For building C++ project
 - [Aseprite](https://www.aseprite.org/) - For game textures
 
-# 🌟 References
+## 🌟 References
 - https://learnopengl.com/
 - https://github.com/Isti01/glCraft
 - https://github.com/Hopson97/HopsonCraft
 
-# 🔒 License
+## 🔒 License
 [YourCraft License](./LICENSE.md)
