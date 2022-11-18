@@ -2,7 +2,7 @@
 <p align="center">
     <img width="100" src="./images/logo.png" alt="YourCraft">
     <h1 align="center">YourCraft</h1>
-    <p align="center"><i>❝ It is not <strike>Mine</strike>, but <b>Your . . . Craft ! ❞ — @qninhdt</b></i></p>
+    <p align="center"><i>❝ It's not <strike>Mine</strike>, but <b>Your . . . Craft ! ❞ — @qninhdt</b></i></p>
 </p>
 
 ---
